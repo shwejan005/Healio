@@ -101,7 +101,7 @@ export default function DashboardPage() {
           transition={{ duration: 0.8 }}
           className="text-center mb-16"
         >
-          <h1 className="text-5xl font-bold mb-4 text-[#2d4c2d]">Welcome to Healio, {user.firstName}!</h1>
+          <h1 className="text-5xl font-semibold mb-4 text-[#2d4c2d]">Welcome to Healio, {user.firstName}!</h1>
           <p className="text-xl text-[#547454]">Embark on your journey to inner peace and balance</p>
         </motion.div>
 

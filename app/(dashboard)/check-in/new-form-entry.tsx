@@ -13,7 +13,7 @@ import { ScrollArea } from "@/components/ui/scroll-area"
 import { X } from "lucide-react"
 import type { NewEntryFormData } from "@/types/mood"
 import { activities } from "./constants/activities"
-import type { MoodEntry } from "@/lib/db/schema"
+import type { MoodEntry } from "@/types/mood" 
 
 const moodEmojis = ["😢", "☹️", "😐", "🙂", "😊"]
 

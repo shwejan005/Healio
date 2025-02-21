@@ -116,7 +116,7 @@ export default function MentalActivities() {
             <p className="text-gray-600">"Find Your Peace"</p>
           </div>
 
-          {/* Relaxing Sounds Section */}
+          {/* Relaxing Sound</div>s Section */}
           <Card className="p-6 bg-white rounded-lg shadow-lg mb-6">
             <h2 className="text-2xl font-medium text-[#314328] mb-4">Relaxing Sounds</h2>
             <p className="text-gray-600 mb-4">"Immerse Yourself In Peaceful Sounds"</p>

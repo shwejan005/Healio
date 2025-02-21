@@ -59,7 +59,9 @@ export function MoodEntry({ entry, onEdit, onDelete }: MoodEntryProps) {
   const handleDelete = async () => {
     setIsDeleting(true)
     try {
-      await onDelete(entry._id)
+      if (entry._id) {
+        await onDelete(entry._id)
+      }
     } catch (error) {
       setIsDeleting(false)
       setShowDeleteDialog(false)

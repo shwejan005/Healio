@@ -2,13 +2,12 @@ import { defineSchema, defineTable } from "convex/server";
 import { v } from "convex/values";
 
 export default defineSchema({
-  users : defineTable({
+  users: defineTable({
     name: v.string(),
     email: v.string(),
     image: v.optional(v.string()),
     clerkId: v.string(),
   }).index("by_clerk_id", ["clerkId"]),
-
 
   moodEntries: defineTable({
     userId: v.string(),
@@ -34,8 +33,8 @@ export default defineSchema({
     votes: v.optional(v.record(v.string(), v.number())),
     createdAt: v.number(),
   })
-  .index("by_author", ["authorId"])
-  .index("by_created", ["createdAt"]),
+    .index("by_author", ["authorId"])
+    .index("by_created", ["createdAt"]),
 
   forumComments: defineTable({
     forumId: v.id("forums"),
@@ -43,9 +42,8 @@ export default defineSchema({
     content: v.string(),
     createdAt: v.number(),
   })
-  .index("by_forum", ["forumId"])
-  .index("by_author", ["authorId"]),
-
+    .index("by_forum", ["forumId"])
+    .index("by_author", ["authorId"]),
 
   goals: defineTable({
     userId: v.string(),
@@ -53,7 +51,7 @@ export default defineSchema({
     completed: v.boolean(),
     createdAt: v.number(),
   }).index("byUserId", ["userId"]),
-  
+
   rooms: defineTable({
     name: v.string(),
     maxUsers: v.number(),
@@ -62,10 +60,15 @@ export default defineSchema({
   }).index("by_name", ["name"]),
 
   messages: defineTable({
-    roomId: v.id("rooms"), // Ensure roomId references rooms
+    roomId: v.id("rooms"),
     sender: v.string(),
     text: v.string(),
     timestamp: v.number(),
   }).index("by_room", ["roomId"]),
 
-})
+  feedback: defineTable({
+    rating: v.number(),
+    text: v.string(),
+    createdAt: v.number(),
+  }),
+});

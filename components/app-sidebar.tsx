@@ -14,7 +14,8 @@ import {
   Bell,
   LogOut,
   ChevronsUpDown,
-  PersonStanding
+  PersonStanding,
+  MessageSquareWarning
 } from "lucide-react";
 import * as React from "react";
 import { NavMain } from "@/components/nav-main";
@@ -49,6 +50,7 @@ const data = {
     { title: "Community Forum", href: "/community", icon: Users2 },
     { title: "Goal Tracking", href: "/goals", icon: Target },
     { title: "Anonymous Chats", href: "/chats", icon: MessageCircle },
+    { title: "Feedback", href: "/feedback", icon: MessageSquareWarning },
   ],
 };
 
