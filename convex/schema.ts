@@ -20,4 +20,10 @@ export default defineSchema({
     activities: v.array(v.string()),
     note: v.optional(v.string()),
   }).index("by_user", ["userId"]),
+
+  gratitudeEntries: defineTable({
+    userId: v.string(),
+    date: v.string(),
+    gratitude: v.string(),
+  }).index("by_user", ["userId"]),
 })
