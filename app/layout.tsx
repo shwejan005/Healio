@@ -11,7 +11,7 @@ const leagueSpartan = League_Spartan({
 
 
 export const metadata: Metadata = {
-  title: "Wellio",
+  title: "Healio",
   description: "The Mental Health App you Look For...",
 };
 

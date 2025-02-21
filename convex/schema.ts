@@ -45,4 +45,12 @@ export default defineSchema({
   })
   .index("by_forum", ["forumId"])
   .index("by_author", ["authorId"]),
+
+
+  goals: defineTable({
+    userId: v.string(),
+    title: v.string(),
+    completed: v.boolean(),
+    createdAt: v.number(),
+  }).index("byUserId", ["userId"]),
 })
