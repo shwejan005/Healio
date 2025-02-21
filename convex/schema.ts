@@ -71,4 +71,10 @@ export default defineSchema({
     text: v.string(),
     createdAt: v.number(),
   }),
+  fitnessLogs: defineTable({
+    userId: v.string(),
+    workoutType: v.string(),
+    duration: v.number(), // In minutes
+    caloriesBurned: v.number(),
+  }).index("by_user", ["userId"]),
 });

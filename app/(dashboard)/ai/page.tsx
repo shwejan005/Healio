@@ -116,7 +116,7 @@ export default function YourCompanionPage() {
                 className={`mb-4 ${message.role === 'user' ? 'text-right' : 'text-left'}`}
               >
                 {message.role === 'user' ? (
-                  <span className="inline-block p-2 rounded-lg bg-[#A5C49C] text-white">
+                  <span className="inline-block p-2 rounded-lg bg-[#c6e0bf] text-white">
                     {message.content}
                   </span>
                 ) : (

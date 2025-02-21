@@ -62,6 +62,11 @@ const features = [
     description: "Get diet recommendations based on your mental & physical health",
     href: "/diet",
   },
+  {
+    title: "Track Physical Activities",
+    description: "Track how you move and improve it too",
+    href: "/fit",
+  },
 ];
 
 interface Feature {
