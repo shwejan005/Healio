@@ -59,3 +59,26 @@ export const getMoodEntries = query({
       .collect();
   },
 });
+
+export const getSleepDebt = query({
+  args: { userId: v.string() },
+  handler: async (ctx, { userId }) => {
+    // Fetch the last 7 days of sleep data for the user
+    const moodEntries = await ctx.db
+      .query("moodEntries")
+      .withIndex("by_user", (q) => q.eq("userId", userId))
+      .order("desc")
+      .take(7);
+
+    // Calculate total sleep debt over the last 7 days
+    let totalDebt = 0;
+    moodEntries.forEach((entry) => {
+      const sleepDeficit = 8 - entry.sleep.hours;
+      if (sleepDeficit > 0) {
+        totalDebt += sleepDeficit;
+      }
+    });
+
+    return { totalSleepDebt: totalDebt };
+  },
+});

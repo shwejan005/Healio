@@ -57,22 +57,6 @@ export default function YourCompanionPage() {
     scrollToBottom()
   }, [messages])
 
-  useEffect(() => {
-    async function fetchContextData() {
-      try {
-        const response = await fetch('/api/fetch-data')
-        if (!response.ok) {
-          throw new Error('Failed to fetch context data')
-        }
-        const data = await response.json()
-        setContextData(data)
-      } catch (error) {
-        console.error('Error fetching context data:', error)
-      }
-    }
-
-    fetchContextData()
-  }, [])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -185,3 +169,4 @@ export default function YourCompanionPage() {
     </div>
   )
 }
+
