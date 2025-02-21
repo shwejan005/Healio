@@ -1,4 +1,3 @@
-// convex/moodEntries.ts
 import { mutation, query } from "./_generated/server";
 import { v } from "convex/values";
 
@@ -19,6 +18,34 @@ export const createMoodEntry = mutation({
   handler: async (ctx, args) => {
     const moodEntryId = await ctx.db.insert("moodEntries", args);
     return moodEntryId;
+  },
+});
+
+export const updateMoodEntry = mutation({
+  args: {
+    id: v.id("moodEntries"),
+    date: v.string(),
+    mood: v.number(),
+    sleep: v.object({
+      hours: v.number(),
+      quality: v.number(),
+    }),
+    anxiety: v.number(),
+    stress: v.number(),
+    activities: v.array(v.string()),
+    note: v.optional(v.string()),
+  },
+  handler: async (ctx, args) => {
+    const { id, ...updates } = args;
+    await ctx.db.patch(id, updates);
+    return id;
+  },
+});
+
+export const deleteMoodEntry = mutation({
+  args: { id: v.id("moodEntries") },
+  handler: async (ctx, args) => {
+    await ctx.db.delete(args.id);
   },
 });
 

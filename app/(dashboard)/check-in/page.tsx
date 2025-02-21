@@ -5,24 +5,82 @@ import { useQuery, useMutation } from "convex/react"
 import { useUser } from "@clerk/nextjs"
 import { api } from "@/convex/_generated/api"
 import { Button } from "@/components/ui/button"
+import { useToast } from "@/hooks/use-toast" 
 import { NewEntryForm } from "./new-form-entry"
 import { MoodEntry } from "./mood-entry"
 import type { MoodEntry as MoodEntryType } from "@/types/mood"
 
 export default function CheckinPage() {
   const [showNewEntry, setShowNewEntry] = useState(false)
+  const [editingEntry, setEditingEntry] = useState<MoodEntryType | null>(null)
   const { user } = useUser()
+  const { toast } = useToast()
+
   const moodEntries = useQuery(api.moodEntries.getMoodEntries, {
     userId: user?.id ?? "",
   })
+
   const addMoodEntry = useMutation(api.moodEntries.createMoodEntry)
+  const updateMoodEntry = useMutation(api.moodEntries.updateMoodEntry)
+  const deleteMoodEntry = useMutation(api.moodEntries.deleteMoodEntry)
 
   const handleNewEntryAdded = async (newEntry: Omit<MoodEntryType, "userId">) => {
-    await addMoodEntry({
-      userId: user?.id ?? "",
-      ...newEntry,
-    })
-    setShowNewEntry(false)
+    try {
+      await addMoodEntry({
+        userId: user?.id ?? "",
+        ...newEntry,
+      })
+      toast({
+        title: "Success!",
+        description: "Your mood entry has been saved.",
+      })
+      setShowNewEntry(false)
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to save your mood entry. Please try again.",
+        variant: "destructive",
+      })
+    }
+  }
+
+  const handleEntryUpdated = async (updatedEntry: Omit<MoodEntryType, "userId">) => {
+    if (!editingEntry?._id) return
+
+    try {
+      await updateMoodEntry({
+        id: editingEntry._id,
+        ...updatedEntry,
+      })
+      toast({
+        title: "Success!",
+        description: "Your mood entry has been updated.",
+      })
+      setEditingEntry(null)
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to update your mood entry. Please try again.",
+        variant: "destructive",
+      })
+    }
+  }
+
+  const handleEntryDeleted = async (id: string) => {
+    try {
+      await deleteMoodEntry({ id })
+      toast({
+        title: "Success!",
+        description: "Your mood entry has been deleted.",
+      })
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to delete your mood entry. Please try again.",
+        variant: "destructive",
+      })
+      throw error // Re-throw to handle in the component
+    }
   }
 
   return (
@@ -53,7 +111,7 @@ export default function CheckinPage() {
           ) : moodEntries.length > 0 ? (
             <div className="space-y-4">
               {moodEntries.map((entry) => (
-                <MoodEntry key={entry._id} entry={entry} />
+                <MoodEntry key={entry._id} entry={entry} onEdit={setEditingEntry} onDelete={handleEntryDeleted} />
               ))}
             </div>
           ) : (
@@ -63,9 +121,17 @@ export default function CheckinPage() {
           )}
         </div>
 
-        {showNewEntry && (
+        {(showNewEntry || editingEntry) && (
           <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-in fade-in duration-200">
-            <NewEntryForm onClose={() => setShowNewEntry(false)} onEntryAdded={handleNewEntryAdded} />
+            <NewEntryForm
+              onClose={() => {
+                setShowNewEntry(false)
+                setEditingEntry(null)
+              }}
+              onEntryAdded={editingEntry ? handleEntryUpdated : handleNewEntryAdded}
+              initialData={editingEntry ?? undefined}
+              isEdit={!!editingEntry}
+            />
           </div>
         )}
       </div>
