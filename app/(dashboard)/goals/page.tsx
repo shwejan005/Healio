@@ -83,7 +83,7 @@ export default function GoalsPage() {
 
         {/* Goals List */}
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5, delay: 0.5 }} className="space-y-4">
-          <h2 className="text-2xl font-medium">📋 Your To-Do List</h2>
+          <h2 className="text-2xl font-medium">Tasks</h2>
           {goals === undefined ? (
             <div className="text-center text-muted-foreground animate-pulse p-8">Loading goals...</div>
           ) : goals.length > 0 ? (
@@ -95,7 +95,7 @@ export default function GoalsPage() {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.5, delay: index * 0.1 }}
                   className={`p-4 flex items-center justify-between rounded-lg transition-transform duration-300 ${
-                    goal.completed ? "bg-gray-200 text-gray-600" : "bg-white shadow-md"
+                    goal.completed ? "bg-[#edf7e8] text-gray-600" : "bg-[#f4f9f2] shadow-md"
                   }`}
                 >
                   <span className="flex-1">{goal.title}</span>

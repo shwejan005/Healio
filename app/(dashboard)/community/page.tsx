@@ -53,13 +53,13 @@ export default function ForumList() {
 
   return (
     <div className="min-h-screen p-6 bg-background">
-      <div className="max-w-3xl mx-auto">
+      <div className="max-w-4xl mx-auto">
         {/* Title */}
         <motion.h1
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3 }}
-          className="text-3xl font-bold text-primary mb-4 text-center"
+          className="text-3xl font-bold text-[#314328] mb-4 text-center"
         >
           Community Forum
         </motion.h1>
@@ -69,9 +69,9 @@ export default function ForumList() {
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.3 }}
-          className="mb-6 rounded-lg border bg-card p-4 shadow-md"
+          className="mb-6 rounded-lg border bg-card/50 backdrop-blur-md p-4 shadow-md"
         >
-          <h2 className="text-lg font-semibold text-primary mb-2">
+          <h2 className="text-lg font-semibold text-[#314328] mb-2">
             Start a Discussion
           </h2>
           <input
@@ -101,7 +101,7 @@ export default function ForumList() {
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.3 }}
-            className="mb-6 rounded-lg border bg-card p-4 shadow-md"
+            className="mb-6 rounded-lg border bg-card/80 backdrop-blur-md p-4 shadow-md"
           >
             {/* Author Info */}
             <div className="flex items-center justify-between">
@@ -112,7 +112,7 @@ export default function ForumList() {
                   alt="Author"
                 />
                 <div>
-                  <p className="font-semibold text-primary">{forum.author.name}</p>
+                  <p className="font-semibold text-[#314328]">{forum.author.name}</p>
                   <p className="text-sm text-muted-foreground">
                     {new Date(forum.createdAt).toLocaleDateString()}
                   </p>
@@ -127,7 +127,7 @@ export default function ForumList() {
             </div>
 
             {/* Post Content */}
-            <h3 className="text-xl font-bold mt-2 text-primary">{forum.title}</h3>
+            <h3 className="text-xl font-bold mt-2 text-[#314328]">{forum.title}</h3>
             <p className="text-muted-foreground mt-2">{forum.content}</p>
 
             {/* Vote & Comment Section */}
@@ -146,44 +146,6 @@ export default function ForumList() {
               </button>
               <div className="flex items-center gap-1 text-muted-foreground">
                 <MessageCircle size={20} /> {forum.comments.length}
-              </div>
-            </div>
-
-            {/* Comments */}
-            <div className="mt-4">
-              <h4 className="text-md font-semibold text-primary">Comments</h4>
-              <div className="ml-4 border-l-2 pl-4 mt-2 border-muted">
-                {forum.comments.map((comment) => (
-                  <div key={comment._id} className="mb-3">
-                    <div className="flex items-center gap-2">
-                      <img
-                        src={comment.author.image || "https://via.placeholder.com/30"}
-                        className="w-6 h-6 rounded-full"
-                        alt="Comment author"
-                      />
-                      <span className="font-medium text-primary">{comment.author.name}</span>
-                    </div>
-                    <p className="ml-8 text-muted-foreground">{comment.content}</p>
-                  </div>
-                ))}
-              </div>
-              {/* Add Comment */}
-              <div className="mt-4 flex gap-2">
-                <input
-                  value={commentContent[forum._id] || ""}
-                  onChange={(e) => setCommentContent({
-                    ...commentContent,
-                    [forum._id]: e.target.value
-                  })}
-                  placeholder="Write a comment..."
-                  className="flex-1 p-2 border bg-muted border-gray-300 rounded"
-                />
-                <button
-                  onClick={() => handleAddComment(forum._id)}
-                  className="bg-primary text-white px-4 py-2 rounded-md hover:bg-primary/80 transition"
-                >
-                  Comment
-                </button>
               </div>
             </div>
           </motion.div>

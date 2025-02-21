@@ -104,7 +104,7 @@ export default function SleepPage() {
   }, [sleepDebt, suggestions])
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#e8f5e9] to-[#c8e6c9] p-4 flex flex-col items-center justify-center">
+    <div className="min-h-screen p-4 pt-12 flex flex-col items-center justify-center">
       {/* Animated Background Elements */}
       <motion.div className="absolute inset-0 pointer-events-none" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
         {[...Array(20)].map((_, i) => (
