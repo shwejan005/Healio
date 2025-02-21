@@ -25,7 +25,7 @@ export default function DashboardPage() {
     <div className="font-montreal">
       <div className="flex-1 p-8">
         <h1 className="text-4xl font-medium text-[#2d4c2d] mb-2">
-          Hey {user.firstName}!, Welcome To Wellio!
+          Hey {user.firstName}!, Welcome To Healio!
         </h1>
         <p className="text-[#547454] text-lg mb-8">
           Ready to take the next step toward a calmer, more balanced life?
