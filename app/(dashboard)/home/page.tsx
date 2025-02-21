@@ -40,9 +40,9 @@ const features = [
 ]
 
 interface Feature {
-  title: string;
-  description: string;
-  href: string;
+  title: string
+  description: string
+  href: string
 }
 
 const FeatureCard = ({ feature, index }: { feature: Feature; index: number }) => {
@@ -58,17 +58,30 @@ const FeatureCard = ({ feature, index }: { feature: Feature; index: number }) =>
       animate={inView ? { opacity: 1, y: 0 } : {}}
       transition={{ duration: 0.5, delay: index * 0.1 }}
     >
-      <Link href={feature.href}>
-        <div className="group relative overflow-hidden rounded-xl bg-[#e4f9e4] shadow-md transition-all duration-300 hover:shadow-lg hover:shadow-[#2d4c2d]/20">
-          <div className="absolute inset-0 bg-gradient-to-br from-[#e0f0e0] to-[#c8e6c8] opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+      <Link href={feature.href} className="block">
+        <motion.div
+          whileHover={{ scale: 1.05, rotate: 1 }}
+          whileTap={{ scale: 0.98 }}
+          className="group relative overflow-hidden rounded-xl bg-[#f3faf3] shadow-md transition-all duration-300"
+        >
+          <motion.div
+            initial={{ opacity: 0 }}
+            whileHover={{ opacity: 1 }}
+            className="absolute inset-0 bg-gradient-to-br from-[#e0f0e0] to-[#c8e6c8] transition-opacity duration-300"
+          />
           <div className="relative z-10 p-6">
             <h2 className="text-xl font-semibold text-[#2d4c2d] mb-2">{feature.title}</h2>
-            <p className="text-[#547454] group-hover:text-[#2d4c2d] transition-colors duration-300">
-              {feature.description}
-            </p>
+            <p className="text-[#547454] transition-colors duration-300">{feature.description}</p>
           </div>
-          <ChevronRight className="absolute bottom-4 right-4 h-6 w-6 text-[#2d4c2d] opacity-0 transition-all duration-300 group-hover:opacity-100" />
-        </div>
+          <motion.div
+            initial={{ x: 0 }}
+            whileHover={{ x: 8 }}
+            transition={{ duration: 0.3 }}
+            className="absolute bottom-4 right-4"
+          >
+            <ChevronRight className="h-6 w-6 text-[#2d4c2d]" />
+          </motion.div>
+        </motion.div>
       </Link>
     </motion.div>
   )
@@ -80,7 +93,7 @@ export default function DashboardPage() {
   if (!user) return <Loading />
 
   return (
-    <div className="font-montreal min-h-screen ">
+    <div className="font-montreal min-h-screen">
       <div className="container mx-auto px-4 py-16">
         <motion.div
           initial={{ opacity: 0, y: -20 }}
@@ -107,13 +120,16 @@ export default function DashboardPage() {
           className="mt-16 text-center"
         >
           <Link href="/profile">
-            <button className="bg-[#4a7a4a] hover:bg-[#5c965c] text-white font-bold py-3 px-6 rounded-full transition-colors duration-300">
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className="bg-[#4a7a4a] hover:bg-[#5c965c] text-white font-bold py-3 px-6 rounded-full transition-colors duration-300 shadow-md"
+            >
               Personalize Your Journey
-            </button>
+            </motion.button>
           </Link>
         </motion.div>
       </div>
     </div>
   )
 }
-
