@@ -26,4 +26,23 @@ export default defineSchema({
     date: v.string(),
     gratitude: v.string(),
   }).index("by_user", ["userId"]),
+
+  forums: defineTable({
+    title: v.string(),
+    content: v.string(),
+    authorId: v.id("users"),
+    votes: v.optional(v.record(v.string(), v.number())),
+    createdAt: v.number(),
+  })
+  .index("by_author", ["authorId"])
+  .index("by_created", ["createdAt"]),
+
+  forumComments: defineTable({
+    forumId: v.id("forums"),
+    authorId: v.id("users"),
+    content: v.string(),
+    createdAt: v.number(),
+  })
+  .index("by_forum", ["forumId"])
+  .index("by_author", ["authorId"]),
 })
