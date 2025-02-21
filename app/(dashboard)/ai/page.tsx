@@ -42,7 +42,7 @@ function parseBoldText(text: string) {
   })
 }
 
-export default function HealioAIPage() {
+export default function YourCompanionPage() {
   const [messages, setMessages] = useState<{ role: string; content: string }[]>([])
   const [input, setInput] = useState('')
   const [isLoading, setIsLoading] = useState(false)
@@ -124,15 +124,15 @@ export default function HealioAIPage() {
           <div className="flex items-center justify-center gap-8 mb-8">
             <img
               src="/images/logohealio.png"
-              alt="Healio AI"
+              alt="Your Companion"
               className="w-24 h-24 object-cover rounded-full"
             />
             <div className="text-center">
               <h1 className="text-5xl font-medium text-[#314328] mb-2">
-                How Can Healio AI Help You Today?
+                Don't worry we've Got Someone for you here
               </h1>
               <p className="text-gray-600">
-                Ask Questions, Share Your Thoughts, Or Seek Advice. Healio AI Is Here To Listen, Support, And Guide You On Your Mental Wellness Journey.
+                Ask Questions, Communicate, Share Your Thoughts, Or Seek Advice. Your Companion Is Here To Listen, Support, And Guide You On Your Mental Wellness Journey.
               </p>
             </div>
           </div>
@@ -164,7 +164,7 @@ export default function HealioAIPage() {
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={handleKeyDown}
-              placeholder="How can Healio AI help you today?"
+              placeholder="How can Your Companion help you today?"
               className="w-full min-h-[120px] p-4 pr-12 rounded-lg border border-[#526D4E]/20 bg-white/80 text-[#526D4E] placeholder-[#526D4E]/60 focus:outline-none focus:ring-2 focus:ring-[#526D4E]/20"
               disabled={isLoading}
             />
@@ -178,11 +178,10 @@ export default function HealioAIPage() {
             </button>
           </form>
           {isLoading && (
-            <p className="text-center mt-2 text-[#526D4E]">Healio AI is thinking...</p>
+            <p className="text-center mt-2 text-[#526D4E]">Your Companion is thinking...</p>
           )}
         </div>
       </main>
     </div>
   )
 }
-

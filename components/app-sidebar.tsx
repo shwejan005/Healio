@@ -13,7 +13,8 @@ import {
   BadgeCheck,
   Bell,
   LogOut,
-  ChevronsUpDown
+  ChevronsUpDown,
+  PersonStanding
 } from "lucide-react";
 import * as React from "react";
 import { NavMain } from "@/components/nav-main";
@@ -42,7 +43,7 @@ const data = {
     { title: "Home", href: "/home", icon: Home },
     { title: "Daily Mood Check-In", href: "/check-in", icon: Calendar },
     { title: "Gratitude Journal", href: "/gratitude", icon: BookHeart },
-    { title: "Healio AI", href: "/ai", icon: Sparkles },
+    { title: "Your Companion", href: "/ai", icon: PersonStanding },
     { title: "Activities", href: "/activities", icon: Plus },
     { title: "Story Generator", href: "/stories", icon: BookOpen },
     { title: "Community Forum", href: "/community", icon: Users2 },
