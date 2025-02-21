@@ -16,7 +16,9 @@ import {
   ChevronsUpDown,
   PersonStanding,
   MessageSquareWarning,
-  Bed
+  Bed,
+  Footprints,
+  Soup
 } from "lucide-react";
 import * as React from "react";
 import { NavMain } from "@/components/nav-main";
@@ -51,6 +53,8 @@ const data = {
     { title: "Community Forum", href: "/community", icon: Users2 },
     { title: "Goal Tracking", href: "/goals", icon: Target },
     { title: "Sleep Debt", href: "/sleep", icon: Bed },
+    { title: "Physical Activity", href: "/fit", icon: Footprints },
+    { title: "Personalised Diet", href: "/diet", icon: Soup },
     { title: "Anonymous Chats", href: "/chats", icon: MessageCircle },
     { title: "Feedback", href: "/feedback", icon: MessageSquareWarning },
   ],

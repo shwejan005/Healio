@@ -52,7 +52,7 @@ export default function ForumList() {
   };
 
   return (
-    <div className="min-h-screen p-6 bg-background">
+    <div className="min-h-screen p-6 ">
       <div className="max-w-3xl mx-auto">
         {/* Title */}
         <motion.h1
