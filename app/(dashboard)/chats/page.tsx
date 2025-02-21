@@ -39,7 +39,7 @@ export default function ChatRoom() {
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
-  }, [messages])
+  }, [])
 
   const handleSetUsername = () => {
     if (username.trim()) {
@@ -78,76 +78,115 @@ export default function ChatRoom() {
     }
   }
 
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -20 }}
-      transition={{ duration: 0.5 }}
-      className="flex h-screen bg-[#f3faf3] p-6"
-    >
-      <Card className="flex flex-col w-full max-w-6xl mx-auto bg-white shadow-md rounded-xl overflow-hidden">
-        {!isUsernameSet ? (
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.5 }}
-            className="flex items-center justify-center min-h-screen"
+  if (!isUsernameSet) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <Card className="p-8 max-w-md w-full bg-white shadow-md rounded-xl">
+          <motion.h2
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            className="text-4xl font-bold text-center text-[#2d4c2d] mb-6"
           >
-            <Card className="p-8 max-w-md w-full bg-white shadow-md rounded-xl">
-              <motion.h2
-                initial={{ opacity: 0, y: -20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.8 }}
-                className="text-4xl font-bold text-center text-[#2d4c2d] mb-6"
-              >
-                Welcome to Healio Chat
-              </motion.h2>
-              <motion.p
-                initial={{ opacity: 0, y: -20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.8, delay: 0.2 }}
-                className="text-xl text-center text-[#547454] mb-8"
-              >
-                Enter your username to continue
-              </motion.p>
-              <Input
-                type="text"
-                placeholder="Your username"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                className="mb-6 border-[#4a7a4a] text-[#2d4c2d] placeholder-[#547454]"
-              />
-              <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-                <Button
-                  onClick={handleSetUsername}
-                  className="w-full bg-[#4a7a4a] hover:bg-[#5c965c] text-white font-bold py-3 px-6 rounded-full transition-colors duration-300 shadow-md"
-                >
-                  Start Your Journey
-                </Button>
-              </motion.div>
-            </Card>
+            Welcome to Healio Chat
+          </motion.h2>
+          <motion.p
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.2 }}
+            className="text-xl text-center text-[#547454] mb-8"
+          >
+            Enter your username to continue
+          </motion.p>
+          <Input
+            type="text"
+            placeholder="Your username"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+            className="mb-6 border-[#4a7a4a] text-[#2d4c2d] placeholder-[#547454]"
+          />
+          <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+            <Button
+              onClick={handleSetUsername}
+              className="w-full bg-[#4a7a4a] hover:bg-[#5c965c] text-white font-bold py-3 px-6 rounded-full transition-colors duration-300 shadow-md"
+            >
+              Start Your Journey
+            </Button>
           </motion.div>
-        ) : (
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.5 }}
-            className="flex flex-col h-full"
-          >
-            <ScrollArea className="flex-grow p-6">
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5 }}
-                className="space-y-4 flex flex-col"
+        </Card>
+      </div>
+    )
+  }
+
+  return (
+    <div className="flex h-screen bg-[#f3faf3] p-6">
+      <Card className="flex flex-col w-full max-w-6xl mx-auto bg-white shadow-md rounded-xl overflow-hidden">
+        {!roomId ? (
+          <div className="p-8 flex flex-col h-full">
+            <motion.h2
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8 }}
+              className="text-3xl font-bold text-[#2d4c2d] mb-8"
+            >
+              Healing Chat Rooms
+            </motion.h2>
+              <Button
+                onClick={handleCreateRoom}
+                className="mb-8 bg-[#4a7a4a] hover:bg-[#5c965c] text-white font-bold py-3 px-6 rounded-full transition-colors duration-300 shadow-md"
               >
+                <Plus className="mr-2" /> Create New Room
+              </Button>
+            <ScrollArea className="flex-grow">
+              <div className="space-y-4">
+                {rooms?.map((room, index) => (
+                  <motion.div
+                    key={room._id}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.5, delay: index * 0.1 }}
+                  >
+                    <div className="p-6 bg-[#e0f0e0] rounded-xl flex justify-between items-center transition-all duration-300 hover:bg-[#c8e6c8]">
+                      <div>
+                        <p className="text-xl font-semibold text-[#2d4c2d]">{room.name}</p>
+                        <p className="text-[#547454]">
+                          <Users className="inline mr-2" />
+                          {room.currentUsers}/{room.maxUsers} participants
+                        </p>
+                      </div>
+                      <Button
+                        variant="outline"
+                        onClick={() => router.push(`?room=${room._id}`)}
+                        className="bg-white text-[#4a7a4a] border-[#4a7a4a] hover:bg-[#4a7a4a] hover:text-white transition-all duration-300"
+                      >
+                        Join Room
+                      </Button>
+                    </div>
+                  </motion.div>
+                ))}
+              </div>
+            </ScrollArea>
+          </div>
+        ) : (
+          <div className="flex flex-col h-full">
+            <div className="p-6 bg-[#e0f0e0] flex justify-between items-center">
+              <h3 className="text-2xl font-bold text-[#2d4c2d]">Healing Room</h3>
+              <Button
+                onClick={handleLeaveRoom}
+                variant="outline"
+                className="bg-white text-[#4a7a4a] border-[#4a7a4a] hover:bg-[#4a7a4a] hover:text-white transition-all duration-300"
+              >
+                <LogOut className="mr-2" /> Leave Room
+              </Button>
+            </div>
+            <ScrollArea className="flex-grow p-6">
+              <div className="space-y-4 flex flex-col">
                 {messages?.map((msg, idx) => (
                   <motion.div
                     key={idx}
-                    initial={{ opacity: 0, y: -10 }}
+                    initial={{ opacity: 0, y: -20 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.3, delay: idx * 0.05 }}
+                    transition={{ duration: 0.5 }}
                   >
                     <div
                       className={cn(
@@ -160,11 +199,31 @@ export default function ChatRoom() {
                     </div>
                   </motion.div>
                 ))}
-              </motion.div>
+              </div>
             </ScrollArea>
-          </motion.div>
+            <div className="p-6 bg-[#e0f0e0]">
+              <div className="flex items-center bg-white rounded-full overflow-hidden shadow-md">
+                <Input
+                  type="text"
+                  value={newMessage}
+                  onChange={(e) => setNewMessage(e.target.value)}
+                  placeholder="Type your message..."
+                  className="flex-grow border-none text-[#2d4c2d] placeholder-[#547454] text-lg py-4 px-6"
+                />
+                <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                  <Button
+                    onClick={handleSendMessage}
+                    className="bg-[#4a7a4a] hover:bg-[#5c965c] text-white rounded-full p-4 m-2 transition-all duration-300"
+                  >
+                    <Send />
+                  </Button>
+                </motion.div>
+              </div>
+            </div>
+          </div>
         )}
       </Card>
-    </motion.div>
+    </div>
   )
 }
+
