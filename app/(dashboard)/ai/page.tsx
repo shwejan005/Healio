@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useRef, useEffect } from 'react'
+import { motion } from 'framer-motion'
 import { ArrowUp } from 'lucide-react'
 
 function parseAndStyleMessage(content: string) {
@@ -46,7 +47,6 @@ export default function YourCompanionPage() {
   const [messages, setMessages] = useState<{ role: string; content: string }[]>([])
   const [input, setInput] = useState('')
   const [isLoading, setIsLoading] = useState(false)
-  const [contextData, setContextData] = useState(null)
   const messagesEndRef = useRef(null)
 
   const scrollToBottom = () => {
@@ -57,77 +57,63 @@ export default function YourCompanionPage() {
     scrollToBottom()
   }, [messages])
 
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!input.trim() || isLoading) return
 
     setIsLoading(true)
     const userMessage = { role: 'user', content: input }
-    setMessages((prevMessages: { role: string; content: string }[]) => [...prevMessages, userMessage])
+    setMessages((prevMessages) => [...prevMessages, userMessage])
     setInput('')
 
     try {
       const response = await fetch('/api/chat', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ 
-          messages: [...messages, userMessage],
-          contextData: contextData
-        }),
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ messages: [...messages, userMessage] }),
       })
-
-      if (!response.ok) {
-        throw new Error('Failed to get response from AI')
-      }
+      if (!response.ok) throw new Error('Failed to get response from AI')
 
       const data = await response.json()
       const aiMessage = { role: 'assistant', content: data.text }
-      setMessages((prevMessages: { role: string; content: string }[]) => [...prevMessages, aiMessage])
+      setMessages((prevMessages) => [...prevMessages, aiMessage])
     } catch (error) {
       console.error('Error:', error)
-      setMessages((prevMessages: { role: string; content: string }[]) => [...prevMessages, { role: 'assistant', content: 'Sorry, I encountered an error. Please try again.' }])
     } finally {
       setIsLoading(false)
     }
   }
 
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault()
-      handleSubmit(e)
-    }
-  }
-
   return (
-    <div className="font-montreal flex min-h-screen bg-[#E5F4DD] items-center justify-center">
+    <motion.div 
+      initial={{ opacity: 0 }} 
+      animate={{ opacity: 1 }} 
+      exit={{ opacity: 0 }} 
+      className="font-montreal flex min-h-screen bg-[#E5F4DD] items-center justify-center"
+    >
       <main className="flex-1 p-8 mt-35">
         <div className="max-w-4xl mx-auto">
-          <div className="flex items-center justify-center gap-8 mb-8">
-            <img
-              src="/images/logohealio.png"
-              alt="Your Companion"
-              className="w-24 h-24 object-cover rounded-full"
-            />
+          <motion.div 
+            initial={{ y: -20, opacity: 0 }} 
+            animate={{ y: 0, opacity: 1 }} 
+            transition={{ duration: 0.5 }}
+            className="flex items-center justify-center gap-8 mb-8"
+          >
+            <img src="/images/logohealio.png" alt="Your Companion" className="w-24 h-24 object-cover rounded-full" />
             <div className="text-center">
-              <h1 className="text-5xl font-medium text-[#314328] mb-2">
-                Don't worry we've Got Someone for you here
-              </h1>
-              <p className="text-gray-600">
-                Ask Questions, Communicate, Share Your Thoughts, Or Seek Advice. Your Companion Is Here To Listen, Support, And Guide You On Your Mental Wellness Journey.
-              </p>
+              <h1 className="text-5xl font-medium text-[#314328] mb-2">Don't worry we've Got Someone for you here</h1>
+              <p className="text-gray-600">Ask Questions, Communicate, Share Your Thoughts, Or Seek Advice. Your Companion Is Here To Listen, Support, And Guide You On Your Mental Wellness Journey.</p>
             </div>
-          </div>
-
+          </motion.div>
+          
           <div className="bg-white/80 rounded-lg p-4 mb-4 h-[400px] overflow-y-auto">
             {messages.map((message, index) => (
-              <div
-                key={index}
-                className={`mb-4 ${
-                  message.role === 'user' ? 'text-right' : 'text-left'
-                }`}
+              <motion.div 
+                key={index} 
+                initial={{ opacity: 0, y: 10 }} 
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.3 }}
+                className={`mb-4 ${message.role === 'user' ? 'text-right' : 'text-left'}`}
               >
                 {message.role === 'user' ? (
                   <span className="inline-block p-2 rounded-lg bg-[#A5C49C] text-white">
@@ -138,35 +124,31 @@ export default function YourCompanionPage() {
                     {parseAndStyleMessage(message.content)}
                   </div>
                 )}
-              </div>
+              </motion.div>
             ))}
             <div ref={messagesEndRef} />
           </div>
 
           <form onSubmit={handleSubmit} className="relative">
-            <textarea
+            <motion.textarea
+              initial={{ scale: 0.95 }}
+              animate={{ scale: 1 }}
+              transition={{ duration: 0.2 }}
               value={input}
               onChange={(e) => setInput(e.target.value)}
-              onKeyDown={handleKeyDown}
               placeholder="How can Your Companion help you today?"
               className="w-full min-h-[120px] p-4 pr-12 rounded-lg border border-[#526D4E]/20 bg-white/80 text-[#526D4E] placeholder-[#526D4E]/60 focus:outline-none focus:ring-2 focus:ring-[#526D4E]/20"
-              disabled={isLoading}
             />
-            <button
+            <motion.button
+              whileHover={{ scale: 1.1 }}
               type="submit"
-              className="absolute bottom-4 right-4 p-2 rounded-lg bg-[#A5C49C] hover:bg-[#94b38b] transition-colors disabled:opacity-50"
-              aria-label="Send message"
-              disabled={isLoading}
+              className="absolute bottom-4 right-4 p-2 rounded-lg bg-[#A5C49C] hover:bg-[#94b38b] transition-colors"
             >
               <ArrowUp className="w-4 h-4 text-white" />
-            </button>
+            </motion.button>
           </form>
-          {isLoading && (
-            <p className="text-center mt-2 text-[#526D4E]">Your Companion is thinking...</p>
-          )}
         </div>
       </main>
-    </div>
+    </motion.div>
   )
 }
-

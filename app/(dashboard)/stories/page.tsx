@@ -1,10 +1,11 @@
-'use client'
+"use client"
 
 import { useState } from 'react'
 import { RefreshCw } from 'lucide-react'
+import { motion } from "framer-motion"
 
 // Utility function to sanitize text
-const sanitizeText = (text : string) => {
+const sanitizeText = (text: string) => {
   return text
     .replace(/[*]/g, "") // Remove asterisks
     .replace(/[\/]/g, "") // Remove slashes
@@ -44,9 +45,19 @@ export default function AutoStoryGenerator() {
   }
 
   return (
-    <div className="font-montreal flex min-h-screen bg-[#E5F4DD] items-center justify-center">
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.6, ease: "easeOut" }}
+      className="font-montreal flex min-h-screen bg-[#E5F4DD] items-center justify-center"
+    >
       <main className="flex-1 p-8">
-        <div className="max-w-4xl mx-auto">
+        <motion.div 
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, ease: "easeOut", delay: 0.2 }}
+          className="max-w-4xl mx-auto"
+        >
           <div className="text-center mb-12">
             <h1 className="text-5xl font-medium text-[#314328] mb-4">
               Need A Boost Of Inspiration?
@@ -58,9 +69,11 @@ export default function AutoStoryGenerator() {
           </div>
 
           <div className="space-y-6">
-            <button
+            <motion.button
               onClick={generateStory}
               disabled={isGenerating}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
               className="w-full py-4 px-6 rounded-lg bg-[#A5C49C] hover:bg-[#94b38b] transition-colors text-white font-medium focus:outline-none focus:ring-2 focus:ring-[#526D4E]/20 disabled:opacity-50 flex items-center justify-center"
             >
               {isGenerating ? (
@@ -74,10 +87,15 @@ export default function AutoStoryGenerator() {
                   Generate New Story
                 </>
               )}
-            </button>
+            </motion.button>
 
-            {generatedStory && ( // Conditionally render this box only if `generatedStory` has content
-              <div className="w-full min-h-[200px] p-6 rounded-lg border border-[#526D4E]/20 bg-white/80 text-[#526D4E]">
+            {generatedStory && (
+              <motion.div 
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, ease: "easeOut", delay: 0.3 }}
+                className="w-full min-h-[200px] p-6 rounded-lg border border-[#526D4E]/20 bg-white/80 text-[#526D4E]"
+              >
                 {isGenerating ? (
                   <div className="flex items-center justify-center h-full">
                     <RefreshCw className="w-8 h-8 animate-spin text-[#526D4E]" />
@@ -85,11 +103,11 @@ export default function AutoStoryGenerator() {
                 ) : (
                   <p dangerouslySetInnerHTML={{ __html: generatedStory }}></p>
                 )}
-              </div>
+              </motion.div>
             )}
           </div>
-        </div>
+        </motion.div>
       </main>
-    </div>
+    </motion.div>
   )
 }
