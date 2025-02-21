@@ -131,14 +131,12 @@ export default function ChatRoom() {
             >
               Healing Chat Rooms
             </motion.h2>
-            <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
               <Button
                 onClick={handleCreateRoom}
                 className="mb-8 bg-[#4a7a4a] hover:bg-[#5c965c] text-white font-bold py-3 px-6 rounded-full transition-colors duration-300 shadow-md"
               >
                 <Plus className="mr-2" /> Create New Room
               </Button>
-            </motion.div>
             <ScrollArea className="flex-grow">
               <div className="space-y-4">
                 {rooms?.map((room, index) => (
@@ -182,27 +180,27 @@ export default function ChatRoom() {
               </Button>
             </div>
             <ScrollArea className="flex-grow p-6">
-  <div className="space-y-4 flex flex-col">
-    {messages?.map((msg, idx) => (
-      <motion.div
-        key={idx}
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-      >
-        <div
-          className={cn(
-            "p-4 max-w-[80%] rounded-xl shadow-md",
-            msg.sender === username ? "ml-auto bg-[#4a7a4a] text-white" : "bg-[#e0f0e0] text-[#2d4c2d]",
-          )}
-        >
-          <p className="font-semibold mb-1">{msg.sender}</p>
-          <p>{msg.text}</p>
-        </div>
-      </motion.div>
-    ))}
-  </div>
-</ScrollArea>
+              <div className="space-y-4 flex flex-col">
+                {messages?.map((msg, idx) => (
+                  <motion.div
+                    key={idx}
+                    initial={{ opacity: 0, y: -20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.5 }}
+                  >
+                    <div
+                      className={cn(
+                        "p-4 max-w-[80%] rounded-xl shadow-md",
+                        msg.sender === username ? "ml-auto bg-[#4a7a4a] text-white" : "bg-[#e0f0e0] text-[#2d4c2d]",
+                      )}
+                    >
+                      <p className="font-semibold mb-1">{msg.sender}</p>
+                      <p>{msg.text}</p>
+                    </div>
+                  </motion.div>
+                ))}
+              </div>
+            </ScrollArea>
             <div className="p-6 bg-[#e0f0e0]">
               <div className="flex items-center bg-white rounded-full overflow-hidden shadow-md">
                 <Input
