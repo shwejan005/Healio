@@ -4,7 +4,7 @@ import { NextResponse } from 'next/server'
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!)
 const model = genAI.getGenerativeModel({ model: 'gemini-pro' })
 
-export async function POST(req: Request) {
+export async function POST(req : Request) {
   try {
     const { messages, contextData } = await req.json()
 
@@ -14,9 +14,8 @@ export async function POST(req: Request) {
       parts: [{ text: m.content }],
     }))
 
-    // Friendly, supportive context
-    const contextPrompt = `You are a caring and supportive companion. Your goal is to make conversations feel warm, engaging, and thoughtful. You have access to the following details: ${JSON.stringify(contextData)}. Use this knowledge to provide meaningful and friendly responses while keeping the conversation natural and encouraging.`
-
+    // Add context data to the prompt
+    const contextPrompt = `You have access to the following data: ${JSON.stringify(contextData)}. Use this information to provide accurate answers to user queries.`
     geminiMessages.unshift({ role: 'user', parts: [{ text: contextPrompt }] })
 
     const result = await model.generateContent({
@@ -32,6 +31,7 @@ export async function POST(req: Request) {
     return NextResponse.json({ text })
   } catch (error) {
     console.error('Error in chat route:', error)
-    return NextResponse.json({ error: 'Oops! Something went wrong. Let’s try again in a moment!' }, { status: 500 })
+    return NextResponse.json({ error: 'An error occurred while processing your request.' }, { status: 500 })
   }
 }
+

@@ -53,4 +53,19 @@ export default defineSchema({
     completed: v.boolean(),
     createdAt: v.number(),
   }).index("byUserId", ["userId"]),
+  
+  rooms: defineTable({
+    name: v.string(),
+    maxUsers: v.number(),
+    currentUsers: v.number(),
+    activeUsers: v.array(v.string()),
+  }).index("by_name", ["name"]),
+
+  messages: defineTable({
+    roomId: v.id("rooms"), // Ensure roomId references rooms
+    sender: v.string(),
+    text: v.string(),
+    timestamp: v.number(),
+  }).index("by_room", ["roomId"]),
+
 })
