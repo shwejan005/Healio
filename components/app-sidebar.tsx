@@ -60,7 +60,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       <Link href='/'>
         <SidebarHeader>
           <img
-            src="/images/wellio.png"
+            src="/images/healio.png"
             alt="logo"
             className="w-[100px] h-[80px]"
           />
