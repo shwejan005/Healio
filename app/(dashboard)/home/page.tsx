@@ -140,7 +140,7 @@ export default function DashboardPage() {
           className="text-center mb-16"
         >
           <motion.h1
-            className="text-6xl font-bold mb-4 text-[#2d4c2d]"
+            className="text-5xl mb-4 text-[#2d4c2d]"
             initial={{ scale: 0.9 }}
             animate={{ scale: 1 }}
             transition={{ duration: 0.5, type: "spring", stiffness: 200 }}

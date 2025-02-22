@@ -1,5 +1,6 @@
-'use client'
-import React, { useState, useRef } from "react";
+"use client";
+
+import React, { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { PlayCircle, StopCircle } from "lucide-react";
@@ -20,14 +21,27 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 
-export default function MentalActivities() {
-  const [currentAudio, setCurrentAudio] = useState(null);
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [currentVideo, setCurrentVideo] = useState(null);
-  const audioRef = useRef(new Audio());
+interface RelaxingSound {
+  label: string;
+  audio: string;
+  image: string;
+  video: string;
+}
 
-  // Relaxing Sounds Data
-  const relaxingSounds = [
+interface Game {
+  label: string;
+  image: string;
+  link: string;
+}
+
+export default function MentalActivities() {
+  const [currentAudio, setCurrentAudio] = useState<string | null>(null);
+  const [isPlaying, setIsPlaying] = useState<boolean>(false);
+  const [currentVideo, setCurrentVideo] = useState<string | undefined>(undefined);
+  const [isClient, setIsClient] = useState(false); // Track if we are on the client side
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+
+  const relaxingSounds: RelaxingSound[] = [
     {
       label: "Ocean Waves 🌊",
       audio: "/assets/oceanwaves.mp3",
@@ -48,52 +62,54 @@ export default function MentalActivities() {
     },
   ];
 
-  // Games Data
-  const games = [
+  const games: Game[] = [
     {
       label: "Tetris",
       image: "/images/tetris.png",
-      link: "/activities/mental/games/tetris", // Fixed route
+      link: "/activities/mental/games/tetris",
     },
     {
       label: "Snake Game",
       image: "/images/snakegame.png",
-      link: "/activities/mental/games/snake", // Fixed route
+      link: "/activities/mental/games/snake",
     },
     {
       label: "Minesweeper",
       image: "/images/mine.png",
-      link: "/activities/mental/games/minesweeper", // Fixed route
+      link: "/activities/mental/games/minesweeper",
     },
   ];
 
-  // Play or stop audio
-  const toggleAudio = (audioSrc) => {
+  useEffect(() => {
+    setIsClient(true); // Set the flag to true when the component is mounted on the client side
+  }, []);
+
+  const toggleAudio = (audioSrc: string) => {
     if (isPlaying && audioSrc === currentAudio) {
-      audioRef.current.pause();
-      audioRef.current.currentTime = 0;
+      audioRef.current?.pause();
+      audioRef.current!.currentTime = 0;
       setIsPlaying(false);
     } else {
       if (currentAudio !== audioSrc) {
-        audioRef.current.src = audioSrc;
+        audioRef.current = new Audio(audioSrc); // Initialize the audio on the client side
       }
-      audioRef.current.play();
+      audioRef.current?.play();
       setCurrentAudio(audioSrc);
       setIsPlaying(true);
     }
   };
 
-  // Set video for dialog
-  const setVideo = (videoSrc) => {
+  const setVideo = (videoSrc: string) => {
     setCurrentVideo(videoSrc);
   };
 
-  // Stop audio when dialog closes
   const stopAudio = () => {
-    audioRef.current.pause();
-    audioRef.current.currentTime = 0;
+    audioRef.current?.pause();
+    audioRef.current!.currentTime = 0;
     setIsPlaying(false);
   };
+
+  if (!isClient) return null; // Render nothing on the server-side
 
   return (
     <div className="font-montreal flex min-h-screen bg-[#E5F4DD]">
@@ -111,126 +127,80 @@ export default function MentalActivities() {
           {/* Header Section */}
           <div className="text-center mb-8">
             <h1 className="text-5xl font-medium text-[#314328] mb-2">
-              Calm Your Mind With These Activities
+              Relax Your Mind with These Activities
             </h1>
-            <p className="text-gray-600">"Find Your Peace"</p>
+            <p className="text-gray-600">
+              &quot;Explore Activities You Can Do Anytime, Anywhere&quot;
+            </p>
           </div>
 
-          {/* Relaxing Sound</div>s Section */}
-          <Card className="p-6 bg-white rounded-lg shadow-lg mb-6">
-            <h2 className="text-2xl font-medium text-[#314328] mb-4">Relaxing Sounds</h2>
-            <p className="text-gray-600 mb-4">"Immerse Yourself In Peaceful Sounds"</p>
+          {/* Relaxing Sounds */}
+          <div className="mb-12">
+            <h2 className="text-3xl font-semibold text-[#314328] mb-6">
+              Relaxing Sounds 🎵
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {relaxingSounds.map((sound) => (
+                <Card key={sound.label} className="p-4 rounded-lg shadow-lg bg-white">
+                  <Image 
+                    src={sound.image} 
+                    alt={sound.label} 
+                    height={400}
+                    width={400}
+                    className="w-full h-48 object-cover rounded-lg"
+                  />
+                  <div className="mt-4 flex items-center justify-between">
+                    <span className="text-lg font-medium">{sound.label}</span>
+                    {isPlaying && currentAudio === sound.audio ? (
+                      <StopCircle className="text-red-500 cursor-pointer" onClick={stopAudio} size={30} />
+                    ) : (
+                      <PlayCircle className="w-8 h-8 text-[#314328] hover:scale-110 transition-transform cursor-pointer" />
+                    )}
+                  </div>
+                  <Dialog>
+                    <DialogTrigger>
+                      <button className="px-3 py-1 mt-2 text-white bg-[#314328] rounded-lg hover:bg-[#1f2b1f] transition">
+                        Watch Video 🎥
+                      </button>
+                    </DialogTrigger>
+                    <DialogContent>
+                      <DialogHeader>
+                        <DialogTitle>{sound.label} Video</DialogTitle>
+                        <DialogDescription>
+                          <video controls className="w-full rounded-md">
+                            <source src={currentVideo} type="video/mp4" />
+                          </video>
+                        </DialogDescription>
+                      </DialogHeader>
+                      <DialogClose />
+                    </DialogContent>
+                  </Dialog>
+                </Card>
+              ))}
+            </div>
+          </div>
 
-            <div className="grid md:grid-cols-3 gap-4">
-              {relaxingSounds.map((sound, index) => (
-                <TooltipProvider key={index}>
-                  <Tooltip delayDuration={200}>
+          {/* Games */}
+          <div className="mb-12">
+            <h2 className="text-3xl font-semibold text-[#314328] mb-6">Brain Games 🎮</h2>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {games.map((game) => (
+                <TooltipProvider key={game.label}>
+                  <Tooltip>
                     <TooltipTrigger asChild>
-                      <Card className="p-4 bg-[#F9FDF7] rounded-lg overflow-hidden">
-                        <Dialog>
-                          <DialogTrigger asChild>
-                            <div
-                              className="cursor-pointer"
-                              onClick={() => setVideo(sound.video)}
-                            >
-                              <div className="aspect-video relative mb-4">
-                                <Image
-                                  src={sound.image}
-                                  alt={sound.label}
-                                  fill
-                                  className="object-cover rounded-lg"
-                                />
-                              </div>
-                              <div className="flex items-center justify-between">
-                                <span className="text-[#314328] font-medium">{sound.label}</span>
-                              </div>
-                            </div>
-                          </DialogTrigger>
-                          <DialogContent
-                            className="sm:max-w-[425px]"
-                            onClose={stopAudio}
-                          >
-                            <DialogHeader>
-                              <DialogTitle>{sound.label} Video</DialogTitle>
-                              <DialogDescription>
-                                Enjoy the visuals along with the sounds.
-                              </DialogDescription>
-                            </DialogHeader>
-                            <div className="mt-4">
-                              <video
-                                key={currentVideo}
-                                src={currentVideo}
-                                controls
-                                autoPlay
-                                className="w-full rounded-lg"
-                              />
-                            </div>
-                            <DialogClose asChild>
-                              <button
-                                className="mt-4 px-4 py-2 bg-[#314328] text-white rounded-lg hover:bg-[#1f2b1f] transition-colors"
-                                onClick={stopAudio}
-                              >
-                                Close
-                              </button>
-                            </DialogClose>
-                          </DialogContent>
-                        </Dialog>
-                        <button
-                          className="mt-2 p-2 bg-[#314328] text-white rounded-full hover:bg-[#1f2b1f] transition-colors"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            toggleAudio(sound.audio);
-                          }}
-                        >
-                          {isPlaying && currentAudio === sound.audio ? (
-                            <StopCircle size={24} />
-                          ) : (
-                            <PlayCircle size={24} />
-                          )}
-                        </button>
-                      </Card>
+                      <Link href={game.link}>
+                        <Card className="p-4 rounded-lg shadow-lg bg-white cursor-pointer">
+                          <Image src={game.image} alt={game.label} width={300} height={200} className="rounded-md" />
+                          <div className="mt-4 text-center text-lg font-medium">{game.label}</div>
+                        </Card>
+                      </Link>
                     </TooltipTrigger>
-                    <TooltipContent>
-                      <p>Click to watch video, Click play button to listen to sound</p>
-                    </TooltipContent>
+                    <TooltipContent>{game.label}</TooltipContent>
                   </Tooltip>
                 </TooltipProvider>
               ))}
             </div>
-          </Card>
-
-          {/* Games Section */}
-          <Card className="p-6 bg-white rounded-lg shadow-lg">
-            <h2 className="text-2xl font-medium text-[#314328] mb-4">Games For Relaxation</h2>
-            <p className="text-gray-600 mb-4">"Engage Your Brain And Relax With Simple Fun Games"</p>
-
-            <div className="grid md:grid-cols-2 gap-6">
-              {games.map((game, index) => (
-                <Link key={index} href={game.link}>
-                  <TooltipProvider key={index}>
-                    <Tooltip delayDuration={200}>
-                      <TooltipTrigger asChild>
-                        <Card className="p-4 bg-[#F9FDF7] rounded-lg overflow-hidden">
-                          <div className="aspect-video relative mb-4">
-                            <Image
-                              src={game.image}
-                              alt={game.label}
-                              fill
-                              className="object-cover rounded-lg"
-                            />
-                          </div>
-                          <h3 className="text-center text-[#314328] font-medium">{game.label}</h3>
-                        </Card>
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        <p>Click to play game</p>
-                      </TooltipContent>
-                    </Tooltip>
-                  </TooltipProvider>
-                </Link>
-              ))}
-            </div>
-          </Card>
+          </div>
         </div>
       </div>
     </div>

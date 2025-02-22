@@ -1,4 +1,4 @@
-const { GoogleGenerativeAI } = require("@google/generative-ai");
+import { GoogleGenerativeAI } from "@google/generative-ai";
 
 const apiKey = process.env.GEMINI_API_KEY;
 if (!apiKey) {
@@ -7,11 +7,9 @@ if (!apiKey) {
 }
 
 const genAI = new GoogleGenerativeAI(apiKey);
-
 const model = genAI.getGenerativeModel({
   model: "gemini-1.5-pro",
 });
-
 
 const generationConfig = {
   temperature: 1,
@@ -28,7 +26,7 @@ const prompts = [
   "Create an inspirational story about a person who found hope and positivity during difficult times. The story should be engaging and heartwarming.",
 ];
 
-export async function POST(req : Request) {
+export async function POST() { // Removed 'req' since it's unused
   try {
     const chatSession = model.startChat({
       generationConfig,
@@ -37,7 +35,7 @@ export async function POST(req : Request) {
 
     // Randomly select a prompt
     const prompt = prompts[Math.floor(Math.random() * prompts.length)];
-    console.log("Selected Prompt:", prompt); // Log the selected prompt for debugging
+    console.log("Selected Prompt:", prompt);
 
     // Generate the story
     const result = await chatSession.sendMessage(prompt);
@@ -52,7 +50,6 @@ export async function POST(req : Request) {
     const story = response.text();
     console.log("Generated Story:", story);
 
-    // Return the story as a JSON response
     return new Response(
       JSON.stringify({ story }),
       {

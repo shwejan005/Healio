@@ -1,4 +1,5 @@
 "use client";
+import Image from "next/image";
 import React from "react";
 
 const About = () => {
@@ -21,9 +22,7 @@ const About = () => {
               <h2 className="text-4xl">AI-Powered Emotional Support</h2>
               <p className="text-2xl text-[#374C2D] mt-2">
                 <i>
-                  "Engage in meaningful conversations with our chatbot, trained
-                  to provide empathetic support and personalized
-                  recommendations."
+                  {"Engage in meaningful conversations with our chatbot, trained to provide empathetic support and personalized recommendations."}
                 </i>
               </p>
             </div>
@@ -33,8 +32,7 @@ const About = () => {
               <h2 className="text-4xl">Mood Tracking and Insights</h2>
               <p className="text-2xl text-[#374C2D] mt-2">
                 <i>
-                  "Log your feelings and gain actionable insights into your
-                  emotional patterns with AI-powered analytics."
+                  {"Log your feelings and gain actionable insights into your emotional patterns with AI-powered analytics."}
                 </i>
               </p>
             </div>
@@ -44,8 +42,7 @@ const About = () => {
               <h2 className="text-4xl">Guided Wellness Activities</h2>
               <p className="text-2xl text-[#374C2D] mt-2">
                 <i>
-                  "Access guided meditations, CBT-based exercises, and
-                  mindfulness tools tailored to your needs."
+                  {"Access guided meditations, CBT-based exercises, and mindfulness tools tailored to your needs."}
                 </i>
               </p>
             </div>
@@ -55,8 +52,7 @@ const About = () => {
               <h2 className="text-4xl">Community and Crisis Support</h2>
               <p className="text-2xl text-[#374C2D] mt-2">
                 <i>
-                  "Connect with others in a safe, moderated community or reach
-                  out to crisis helplines when you need urgent help."
+                  {"Connect with others in a safe, moderated community or reach out to crisis helplines when you need urgent help."}
                 </i>
               </p>
             </div>
@@ -65,9 +61,11 @@ const About = () => {
 
         {/* Right side: Image */}
         <div className="flex justify-end w-1/2 px-[110px]">
-          <img
+          <Image
             src="/images/featured-image.png"
             alt="About Image"
+            height={500}
+            width={500}
             className="rounded-lg object-cover"
             style={{ width: "500px", height: "500px" }}
           />

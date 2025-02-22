@@ -14,7 +14,7 @@ export default function GratitudePage() {
   const entries = useQuery(api.journals.getEntries, userId ? { userId } : "skip");
   const addEntry = useMutation(api.journals.addEntry);
 
-  const handleAddEntry = async (entry: { gratitude: any }) => {
+  const handleAddEntry = async (entry: { gratitude: string }) => {
     if (!userId) return;
     await addEntry({ userId, gratitude: entry.gratitude });
   };

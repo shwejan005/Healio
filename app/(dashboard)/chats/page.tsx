@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect, useRef } from "react"
+import { useState, useEffect, useRef, Suspense } from "react"
 import { useMutation, useQuery } from "convex/react"
 import { api } from "@/convex/_generated/api"
 import { useSearchParams, useRouter } from "next/navigation"
@@ -78,6 +78,7 @@ export default function ChatRoom() {
     }
   }
 
+  // If the username is not set, ask the user to enter a username.
   if (!isUsernameSet) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -131,12 +132,12 @@ export default function ChatRoom() {
             >
               Healing Chat Rooms
             </motion.h2>
-              <Button
-                onClick={handleCreateRoom}
-                className="mb-8 bg-[#4a7a4a] hover:bg-[#5c965c] text-white font-bold py-3 px-6 rounded-full transition-colors duration-300 shadow-md"
-              >
-                <Plus className="mr-2" /> Create New Room
-              </Button>
+            <Button
+              onClick={handleCreateRoom}
+              className="mb-8 bg-[#4a7a4a] hover:bg-[#5c965c] text-white font-bold py-3 px-6 rounded-full transition-colors duration-300 shadow-md"
+            >
+              <Plus className="mr-2" /> Create New Room
+            </Button>
             <ScrollArea className="flex-grow">
               <div className="space-y-4">
                 {rooms?.map((room, index) => (
@@ -226,4 +227,3 @@ export default function ChatRoom() {
     </div>
   )
 }
-

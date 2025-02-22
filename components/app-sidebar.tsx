@@ -1,27 +1,15 @@
 "use client"
 
-import {
-  BookHeart,
-  BookOpen,
-  Calendar,
-  Home,
-  MessageCircle,
-  Plus,
-  Sparkles,
-  Target,
-  Users2,
-  BadgeCheck,
-  Bell,
-  LogOut,
-  ChevronsUpDown,
-  PersonStanding,
-  MessageSquareWarning,
-  Bed,
-  Footprints,
-  Soup
-} from "lucide-react";
-import * as React from "react";
 import { NavMain } from "@/components/nav-main";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import {
   Sidebar,
   SidebarContent,
@@ -30,17 +18,29 @@ import {
   SidebarRail,
   SidebarSeparator,
 } from "@/components/ui/sidebar";
+import { useClerk, useUser } from "@clerk/nextjs";
 import {
-  DropdownMenu,
-  DropdownMenuTrigger,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuGroup,
-} from "@/components/ui/dropdown-menu";
-import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import { useUser, useClerk } from "@clerk/nextjs";
+  BadgeCheck,
+  Bed,
+  Bell,
+  BookHeart,
+  BookOpen,
+  Calendar,
+  ChevronsUpDown,
+  Footprints,
+  Home,
+  LogOut,
+  MessageCircle,
+  MessageSquareWarning,
+  PersonStanding,
+  Plus,
+  Soup,
+  Target,
+  Users2
+} from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
+import * as React from "react";
 
 const data = {
   navMain: [
@@ -68,8 +68,10 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     <Sidebar collapsible="icon" {...props} className="font-montreal border-r border-gray-300">
       <Link href='/'>
         <SidebarHeader>
-          <img
+          <Image
             src="/images/healio.png"
+            height={40}
+            width={40}
             alt="logo"
             className="w-[100px] h-[80px]"
           />

@@ -9,18 +9,26 @@ import { useMutation, useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import Image from "next/image";
 import { useUser } from "@clerk/nextjs";
+import { Id } from "@/convex/_generated/dataModel";
 
 export default function FeedbackPage() {
   const { user } = useUser()
   const userId = user?.id
   const [rating, setRating] = useState(0);
   const [feedback, setFeedback] = useState("");
-  const [editId, setEditId] = useState<string | null>(null);
+  const [editId, setEditId] = useState<Id<"feedback"> | null>(null);
 
   // Convex mutations and queries
   const addFeedback = useMutation(api.feedback.submit);
   const updateFeedback = useMutation(api.feedback.update);
-  const feedbackList = useQuery(api.feedback.getAll) || [];
+  const feedbackList = useQuery(api.feedback.getAll) as { 
+    _id: Id<"feedback">; 
+    _creationTime: number; 
+    createdAt: number; 
+    text: string; 
+    rating: number; 
+    userId: string; 
+  }[] || [];
 
   // Fetch user details
   const getUser = useQuery(api.users.getUser, { clerkId: userId || "" });
@@ -49,7 +57,7 @@ export default function FeedbackPage() {
   };
 
   // Enter edit mode
-  const handleEdit = (id: string, rating: number, text: string) => {
+  const handleEdit = (id: Id<"feedback">, rating: number, text: string) => {
     setEditId(id);
     setRating(rating);
     setFeedback(text);
@@ -113,7 +121,7 @@ export default function FeedbackPage() {
         {feedbackList.length === 0 ? (
           <p className="text-center text-lg text-gray-600">No feedback yet. Be the first! 🌟</p>
         ) : (
-          feedbackList.map((f: { _id: string; rating: number; text: string; userId: string }, idx: number) => {
+          feedbackList.map((f: { _id: Id<"feedback">; rating: number; text: string; userId: string }, idx: number) => {
             const user = getUser?._id === f.userId ? getUser : null;
             return (
               <motion.div key={idx} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3, delay: idx * 0.1 }}>

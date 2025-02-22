@@ -5,7 +5,7 @@ import React from 'react';
 const About = () => {
   return (
     <div className='block -mt-5 w-full p-20 rounded-tl-3xl rounded-tr-3xl'>
-      {/* Top border (using hr for full-width border) */}
+      {/* Top border */}
       <hr className="border-t-[1px] border-[#99AD53] w-full mb-10" />
       
       <div className="w-full flex justify-between items-center gap-10">
@@ -15,8 +15,8 @@ const About = () => {
             src="/images/sunshine.png" 
             alt="About Image"
             className="rounded-lg object-cover" 
-            width={400}
-            height={400} 
+            width={300}
+            height={300} 
           />
         </div>
 
@@ -30,12 +30,12 @@ const About = () => {
           {/* Paragraph */}
           <p className="mt-5 text-[1.6vw] text-[#374C2D] font-montreal">
             Welcome to Healio, your personal mental wellness companion. 
-            We use cutting-edge AI and cloud-based technology to create a safe, supportive environment where you can explore your emotions, build resilience, and achieve peace of mind. Whether you're managing stress, looking for motivation, or simply need someone to talk to, we are here to help.
+            We use cutting-edge AI and cloud-based technology to create a safe, supportive environment where you can explore your emotions, build resilience, and achieve peace of mind. Whether you&apos;re managing stress, looking for motivation, or simply need someone to talk to, we are here to help.
           </p>
         </div>
       </div>
 
-      {/* Bottom border (using hr for full-width border) */}
+      {/* Bottom border */}
       <hr className="border-t-[1px] border-[#99AD53] w-full mt-10" />
     </div>
   );

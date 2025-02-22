@@ -1,4 +1,5 @@
 "use client";
+import Image from 'next/image';
 import React from 'react';
 
 const Footer = () => {
@@ -11,11 +12,12 @@ const Footer = () => {
           <h1 className='text-[8vw] uppercase leading-none -mb-10'>Healthier Mind</h1>
         </div>
       </div>
-      <img 
+      <Image
         src="/images/healiowhite.png" 
         alt="Your Image" 
+        height={110}
+        width={280}
         className="absolute bottom-10 right-10" 
-        style={{ width: '280px', height: '110px' }} 
       />
     </div>
   );
