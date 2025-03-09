@@ -55,19 +55,19 @@ export const getFitnessLogs = query({
   },
 });
 
-// // Query to fetch fitness logs for the last 7 days
-// export const getWeeklyFitnessLogs = query({
-//   args: { userId: v.string() },
-//   handler: async (ctx, args) => {
-//     const allLogs = await ctx.db
-//       .query("fitnessLogs")
-//       .withIndex("by_user", (q) => q.eq("userId", args.userId))
-//       .collect();
+// Query to fetch fitness logs for the last 7 days
+export const getWeeklyFitnessLogs = query({
+  args: { userId: v.string() },
+  handler: async (ctx, args) => {
+    const allLogs = await ctx.db
+      .query("fitnessLogs")
+      .withIndex("by_user", (q) => q.eq("userId", args.userId))
+      .collect();
 
-//     // Get logs for the last 7 days
-//     const now = Date.now();
-//     const sevenDaysAgo = now - 7 * 24 * 60 * 60 * 1000; // 7 days in milliseconds
+    // Get logs for the last 7 days
+    const now = Date.now();
+    const sevenDaysAgo = now - 7 * 24 * 60 * 60 * 1000; // 7 days in milliseconds
 
-//     return allLogs.filter((log) => log._creationTime >= sevenDaysAgo);
-//   },
-// });
+    return allLogs.filter((log) => log._creationTime >= sevenDaysAgo);
+  },
+});

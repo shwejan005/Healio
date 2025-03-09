@@ -20,6 +20,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { Button } from "@/components/ui/button";
 
 interface RelaxingSound {
   label: string;
@@ -98,11 +99,6 @@ export default function MentalActivities() {
       setIsPlaying(true);
     }
   };
-
-  const setVideo = (videoSrc: string) => {
-    setCurrentVideo(videoSrc);
-  };
-
   const stopAudio = () => {
     audioRef.current?.pause();
     audioRef.current!.currentTime = 0;
@@ -159,9 +155,9 @@ export default function MentalActivities() {
                   </div>
                   <Dialog>
                     <DialogTrigger>
-                      <button className="px-3 py-1 mt-2 text-white bg-[#314328] rounded-lg hover:bg-[#1f2b1f] transition">
+                      <Button className="px-3 py-1 mt-2 text-white bg-[#314328] rounded-lg hover:bg-[#1f2b1f] transition">
                         Watch Video 🎥
-                      </button>
+                      </Button>
                     </DialogTrigger>
                     <DialogContent>
                       <DialogHeader>

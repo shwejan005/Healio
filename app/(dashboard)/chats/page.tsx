@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect, useRef, Suspense } from "react"
+import { useState, useEffect, useRef } from "react"
 import { useMutation, useQuery } from "convex/react"
 import { api } from "@/convex/_generated/api"
 import { useSearchParams, useRouter } from "next/navigation"
@@ -33,13 +33,16 @@ export default function ChatRoom() {
 
   useEffect(() => {
     if (roomId && isUsernameSet) {
-      joinRoom({ roomId, username }).catch((err) => console.error("Join Room Error:", err))
+      joinRoom({ roomId, username }).catch((err) =>
+        console.error("Join Room Error:", err)
+      )
     }
   }, [roomId, isUsernameSet, joinRoom, username])
 
+  // Scroll to bottom when messages update
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
-  }, [])
+  }, [messages])
 
   const handleSetUsername = () => {
     if (username.trim()) {
@@ -78,7 +81,7 @@ export default function ChatRoom() {
     }
   }
 
-  // If the username is not set, ask the user to enter a username.
+  // If username is not set, prompt user to enter one.
   if (!isUsernameSet) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -149,7 +152,9 @@ export default function ChatRoom() {
                   >
                     <div className="p-6 bg-[#e0f0e0] rounded-xl flex justify-between items-center transition-all duration-300 hover:bg-[#c8e6c8]">
                       <div>
-                        <p className="text-xl font-semibold text-[#2d4c2d]">{room.name}</p>
+                        <p className="text-xl font-semibold text-[#2d4c2d]">
+                          {room.name}
+                        </p>
                         <p className="text-[#547454]">
                           <Users className="inline mr-2" />
                           {room.currentUsers}/{room.maxUsers} participants
@@ -171,7 +176,9 @@ export default function ChatRoom() {
         ) : (
           <div className="flex flex-col h-full">
             <div className="p-6 bg-[#e0f0e0] flex justify-between items-center">
-              <h3 className="text-2xl font-bold text-[#2d4c2d]">Healing Room</h3>
+              <h3 className="text-2xl font-bold text-[#2d4c2d]">
+                Healing Room
+              </h3>
               <Button
                 onClick={handleLeaveRoom}
                 variant="outline"
@@ -192,7 +199,9 @@ export default function ChatRoom() {
                     <div
                       className={cn(
                         "p-4 max-w-[80%] rounded-xl shadow-md",
-                        msg.sender === username ? "ml-auto bg-[#4a7a4a] text-white" : "bg-[#e0f0e0] text-[#2d4c2d]",
+                        msg.sender === username
+                          ? "ml-auto bg-[#4a7a4a] text-white"
+                          : "bg-[#e0f0e0] text-[#2d4c2d]"
                       )}
                     >
                       <p className="font-semibold mb-1">{msg.sender}</p>
@@ -201,6 +210,7 @@ export default function ChatRoom() {
                   </motion.div>
                 ))}
               </div>
+              <div ref={messagesEndRef} />
             </ScrollArea>
             <div className="p-6 bg-[#e0f0e0]">
               <div className="flex items-center bg-white rounded-full overflow-hidden shadow-md">
@@ -211,7 +221,10 @@ export default function ChatRoom() {
                   placeholder="Type your message..."
                   className="flex-grow border-none text-[#2d4c2d] placeholder-[#547454] text-lg py-4 px-6"
                 />
-                <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                <motion.div
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                >
                   <Button
                     onClick={handleSendMessage}
                     className="bg-[#4a7a4a] hover:bg-[#5c965c] text-white rounded-full p-4 m-2 transition-all duration-300"

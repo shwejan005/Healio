@@ -60,25 +60,21 @@ export const getMoodEntries = query({
   },
 });
 
+
 export const getSleepDebt = query({
   args: { userId: v.string() },
-  handler: async (ctx, { userId }) => {
-    // Fetch the last 7 days of sleep data for the user
-    const moodEntries = await ctx.db
+  handler: async (ctx, { userId }): Promise<{ totalSleepDebt: number }> => {
+    const entries = await ctx.db
       .query("moodEntries")
-      .withIndex("by_user", (q) => q.eq("userId", userId))
+      .withIndex("by_user", q => q.eq("userId", userId))
       .order("desc")
-      .take(7);
+      .take(7)
 
-    // Calculate total sleep debt over the last 7 days
-    let totalDebt = 0;
-    moodEntries.forEach((entry) => {
-      const sleepDeficit = 8 - entry.sleep.hours;
-      if (sleepDeficit > 0) {
-        totalDebt += sleepDeficit;
-      }
-    });
+    const total = entries.reduce((acc, entry) => {
+      const deficit = Math.max(8 - entry.sleep.hours, 0)
+      return acc + deficit
+    }, 0)
 
-    return { totalSleepDebt: totalDebt };
-  },
-});
+    return { totalSleepDebt: Math.round(total * 10) / 10 }
+  }
+})

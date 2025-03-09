@@ -1,19 +1,12 @@
 "use client";
 
 import { Card } from "@/components/ui/card";
-import { api } from "@/convex/_generated/api";
 import { useUser } from "@clerk/nextjs";
-import { GoogleGenerativeAI } from "@google/generative-ai";
 import { useQuery } from "convex/react";
 import { motion } from "framer-motion";
-import {
-  AppleIcon,
-  SaladIcon
-} from "lucide-react";
+import { AppleIcon, SaladIcon } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
-
-// Initialize Gemini AI
-const genAI = new GoogleGenerativeAI(process.env.NEXT_PUBLIC_GEMINII_API_KEY!);
+import { api } from "@/convex/_generated/api";
 
 function parseAndStyleMessage(content: string) {
   return content.split("\n").map((line, index) => {
@@ -52,7 +45,7 @@ function parseBoldText(text: string) {
   );
 }
 
-export default function HomePage() {
+export default function DietPage() {
   const { user } = useUser();
   const userId = user?.id || "";
   const [dietPlan, setDietPlan] = useState<string | null>(null);
@@ -103,10 +96,28 @@ export default function HomePage() {
         - Include emojis and practical portions
       `;
 
-      const model = genAI.getGenerativeModel({ model: "gemini-pro" });
-      const result = await model.generateContent(prompt);
-      const text = result.response.text();
-      setDietPlan(text.replace(/(\*\*)/g, "**"));
+      const geminiApiKey = process.env.NEXT_PUBLIC_GEMINI_API_KEY;
+      const response = await fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${geminiApiKey}`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            contents: [{ parts: [{ text: prompt }] }],
+          }),
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Gemini API request failed");
+      }
+
+      const data = await response.json();
+      const generatedText = data.candidates?.[0]?.content?.parts?.[0]?.text || "No response received.";
+
+      setDietPlan(generatedText);
     } catch (error) {
       console.error("Diet generation failed:", error);
       setDietPlan("Couldn't generate diet plan. Please try again later.");
@@ -122,9 +133,9 @@ export default function HomePage() {
   }, [userId, moodEntries, journalEntries, fitnessLogs, generateDietPlan]);
 
   return (
-    <motion.div 
-      initial={{ opacity: 0 }} 
-      animate={{ opacity: 1 }} 
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
       className="font-montreal flex flex-col items-center justify-center min-h-screen bg-[#E5F4DD] px-6 py-12"
     >
       <div className="max-w-4xl w-full">
