@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef, FC } from "react";
+import React, { useState, useEffect, useRef, Suspense, FC } from "react";
 import { useMutation, useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { useSearchParams, useRouter } from "next/navigation";
@@ -106,9 +106,9 @@ const ChatInput: FC<ChatInputProps> = ({ newMessage, setNewMessage, onSend }) =>
   </div>
 );
 
-// --- Main Component ---
+// --- Main ChatRoom Component ---
 
-export default function BetterChatRoom() {
+function ChatRoom() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const [username, setUsername] = useState("");
@@ -167,7 +167,6 @@ export default function BetterChatRoom() {
     }
   };
 
-  // Render username setup if not set
   if (!isUsernameSet) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -211,7 +210,6 @@ export default function BetterChatRoom() {
   return (
     <div className="flex h-screen bg-[#f3faf3] p-6">
       <Card className="flex flex-col w-full max-w-6xl mx-auto bg-white shadow-md rounded-xl overflow-hidden">
-        {/* If no room is selected, show list of rooms */}
         {!roomId ? (
           <div className="p-8 flex flex-col h-full">
             <motion.h2
@@ -261,14 +259,27 @@ export default function BetterChatRoom() {
             </ScrollArea>
           </div>
         ) : (
-          // If room is selected, show chat interface
           <>
             <ChatHeader roomName="Healing Room" onLeave={handleLeaveRoom} />
             <MessageList messages={messages || []} username={username} />
-            <ChatInput newMessage={newMessage} setNewMessage={setNewMessage} onSend={handleSendMessage} />
+            <ChatInput
+              newMessage={newMessage}
+              setNewMessage={setNewMessage}
+              onSend={handleSendMessage}
+            />
           </>
         )}
       </Card>
     </div>
+  );
+}
+
+// --- Default Export Wrapped in Suspense ---
+
+export default function ChatRoomWrapper() {
+  return (
+    <Suspense fallback={<div className="flex items-center justify-center min-h-screen">Loading Chat...</div>}>
+      <ChatRoom />
+    </Suspense>
   );
 }
