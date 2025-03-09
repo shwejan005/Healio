@@ -114,7 +114,7 @@ export default function SleepPage() {
                 ) : suggestions ? (
                   <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="mt-6">
                     <h2 className="text-xl font-semibold mb-2 text-[#2e7d32]">Sleep Improvement Tips:</h2>
-                    <div>{suggestions}</div>
+                    <div>{parseAndStyleMessage(suggestions)}</div>
                   </motion.div>
                 ) : null}
               </motion.div>
@@ -124,4 +124,47 @@ export default function SleepPage() {
       </motion.div>
     </div>
   )
+}
+
+function parseAndStyleMessage(content: string) {
+  const lines = content.split("\n")
+  let inList = false
+
+  return lines.map((line: string, index: number) => {
+    if (line.startsWith("**") && line.endsWith("**")) {
+      return (
+        <h2 key={index} className="text-xl font-bold mt-4 mb-2 text-[#314328]">
+          {line.replace(/\*\*/g, "")}
+        </h2>
+      )
+    } else if (line.trim().startsWith("*")) {
+      if (!inList) {
+        inList = true
+        return (
+          <ul key={index} className="list-disc pl-5 mb-2">
+            <li>{parseBoldText(line.trim().substring(1).trim())}</li>
+          </ul>
+        )
+      } else {
+        return <li key={index}>{parseBoldText(line.trim().substring(1).trim())}</li>
+      }
+    } else {
+      inList = false
+      return (
+        <p key={index} className="mb-2">
+          {parseBoldText(line)}
+        </p>
+      )
+    }
+  })
+}
+
+function parseBoldText(text: string) {
+  const parts = text.split(/(\*\*.*?\*\*)/)
+  return parts.map((part: string, index: number) => {
+    if (part.startsWith("**") && part.endsWith("**")) {
+      return <strong key={index}>{part.slice(2, -2)}</strong>
+    }
+    return part
+  })
 }
