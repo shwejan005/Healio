@@ -71,6 +71,7 @@ export default defineSchema({
     text: v.string(),
     createdAt: v.number(),
   }),
+  
   fitnessLogs: defineTable({
     userId: v.string(),
     workoutType: v.string(),
