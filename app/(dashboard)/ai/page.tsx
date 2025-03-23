@@ -1,187 +1,125 @@
-"use client"
+"use client";
 
-import type React from "react"
-
-import { useState, useRef, useEffect } from "react"
-import { motion, AnimatePresence } from "framer-motion"
-import { ArrowUp } from 'lucide-react'
-import Image from "next/image"
-
-function parseAndStyleMessage(content: string) {
-  const lines = content.split("\n")
-  let currentHeading = ""
-  let inList = false
-
-  return lines.map((line: string, index: number) => {
-    if (line.startsWith("**") && line.endsWith("**")) {
-      currentHeading = line.replace(/\*\*/g, "")
-      return (
-        <h2 key={index} className="text-xl font-bold mt-4 mb-2 text-[#314328]">
-          {currentHeading}
-        </h2>
-      )
-    } else if (line.trim().startsWith("*")) {
-      if (!inList) {
-        inList = true
-        return (
-          <ul key={index} className="list-disc pl-5 mb-2">
-            <li>{parseBoldText(line.trim().substring(1).trim())}</li>
-          </ul>
-        )
-      } else {
-        return <li key={index}>{parseBoldText(line.trim().substring(1).trim())}</li>
-      }
-    } else {
-      inList = false
-      return (
-        <p key={index} className="mb-2">
-          {parseBoldText(line)}
-        </p>
-      )
-    }
-  })
-}
-
-function parseBoldText(text: string) {
-  const parts = text.split(/(\*\*.*?\*\*)/)
-  return parts.map((part: string, index: number) => {
-    if (part.startsWith("**") && part.endsWith("**")) {
-      return <strong key={index}>{part.slice(2, -2)}</strong>
-    }
-    return part
-  })
-}
+import type React from "react";
+import { useState, useRef, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { ArrowUp } from "lucide-react";
+import Image from "next/image";
+import ReactMarkdown from "react-markdown";
 
 export default function YourCompanionPage() {
-  const [messages, setMessages] = useState<{ sender: string; text: string }[]>([])
-  const [input, setInput] = useState("")
-  const [isLoading, setIsLoading] = useState(false)
-  const [isAutoScroll, setIsAutoScroll] = useState(true)
-  const messagesEndRef = useRef<HTMLDivElement>(null)
-  const chatContainerRef = useRef<HTMLDivElement>(null)
+  const [messages, setMessages] = useState<{ sender: string; text: string }[]>([]);
+  const [input, setInput] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [isAutoScroll, setIsAutoScroll] = useState(true);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const chatContainerRef = useRef<HTMLDivElement>(null);
 
   // Function to scroll to the bottom
   const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
-  }
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
 
   // Handle manual scrolling
   const handleScroll = () => {
     if (chatContainerRef.current) {
-      const { scrollTop, scrollHeight, clientHeight } = chatContainerRef.current
-      // If the user is within 50px of the bottom, enable auto-scroll
+      const { scrollTop, scrollHeight, clientHeight } = chatContainerRef.current;
       if (scrollHeight - scrollTop - clientHeight < 50) {
-        setIsAutoScroll(true)
+        setIsAutoScroll(true);
       } else {
-        setIsAutoScroll(false)
+        setIsAutoScroll(false);
       }
     }
-  }
+  };
 
-  // Auto-scroll only if enabled
   useEffect(() => {
     if (isAutoScroll) {
-      scrollToBottom()
+      scrollToBottom();
     }
-  }, [messages, isAutoScroll])
+  }, [messages, isAutoScroll]);
 
   // Add keyboard navigation for scrolling
   useEffect(() => {
-    const chatContainer = chatContainerRef.current
-
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (!chatContainer) return
-
-      if (e.key === "ArrowUp") {
-        e.preventDefault()
-        chatContainer.scrollTop -= 30
+    const chatContainer = chatContainerRef.current;
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (!chatContainer) return;
+      if (event.key === "ArrowUp") {
+        event.preventDefault();
+        chatContainer.scrollTop -= 30;
         if (chatContainer.scrollTop <= 0) {
-          setIsAutoScroll(false)
+          setIsAutoScroll(false);
         }
-      } else if (e.key === "ArrowDown") {
-        e.preventDefault()
-        chatContainer.scrollTop += 30
-
-        // Check if we've scrolled to the bottom
+      } else if (event.key === "ArrowDown") {
+        event.preventDefault();
+        chatContainer.scrollTop += 30;
         if (chatContainer.scrollHeight - chatContainer.scrollTop - chatContainer.clientHeight < 50) {
-          setIsAutoScroll(true)
+          setIsAutoScroll(true);
         }
       }
-    }
-
+    };
     if (chatContainer) {
-      chatContainer.addEventListener("keydown", handleKeyDown)
+      chatContainer.addEventListener("keydown", handleKeyDown);
     }
-
     return () => {
       if (chatContainer) {
-        chatContainer.removeEventListener("keydown", handleKeyDown)
+        chatContainer.removeEventListener("keydown", handleKeyDown);
       }
-    }
-  }, [])
+    };
+  }, []);
 
-  // Enable smooth scrolling for touchpad
+  // Enable smooth scrolling for touchpad using an EventListener that ignores its event parameter.
   useEffect(() => {
     const chatContainer = chatContainerRef.current;
-    
     if (chatContainer) {
-      // Prevent default for wheel events to ensure custom handling works
-      const handleWheel = (e: WheelEvent) => {
-        // Don't prevent default as it interferes with native scrolling
-        // Just update the auto-scroll state based on scroll position
+      const handleWheel: EventListener = () => {
         if (chatContainer.scrollHeight - chatContainer.scrollTop - chatContainer.clientHeight < 50) {
           setIsAutoScroll(true);
         } else {
           setIsAutoScroll(false);
         }
       };
-      
-      chatContainer.addEventListener('wheel', handleWheel, { passive: true });
-      
+      chatContainer.addEventListener("wheel", handleWheel, { passive: true });
       return () => {
-        chatContainer.removeEventListener('wheel', handleWheel);
+        chatContainer.removeEventListener("wheel", handleWheel);
       };
     }
   }, []);
 
   const sendMessage = async () => {
-    if (!input.trim() || isLoading) return
-
-    const newMessage = { sender: "user", text: input.trim() }
-    setMessages([...messages, newMessage])
-    setInput("")
-    setIsLoading(true)
-
+    if (!input.trim() || isLoading) return;
+    const newMessage = { sender: "user", text: input.trim() };
+    setMessages([...messages, newMessage]);
+    setInput("");
+    setIsLoading(true);
     try {
       const response = await fetch("/api/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ query: input }),
-      })
-
-      const data = await response.json()
+      });
+      const data = await response.json();
       const aiMessage = {
         sender: "ai",
         text: data.response || "I apologize, I need to process that request further.",
-      }
-      setMessages((prevMessages) => [...prevMessages, aiMessage])
-    } catch (error) {
+      };
+      setMessages((prevMessages) => [...prevMessages, aiMessage]);
+    } catch {
       const errorMessage = {
         sender: "ai",
         text: "An error occurred. Please try again.",
-      }
-      setMessages((prevMessages) => [...prevMessages, errorMessage])
+      };
+      setMessages((prevMessages) => [...prevMessages, errorMessage]);
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === "Enter" && !e.shiftKey) {
-      e.preventDefault()
-      sendMessage()
+      e.preventDefault();
+      sendMessage();
     }
-  }
+  };
 
   return (
     <motion.div
@@ -206,7 +144,9 @@ export default function YourCompanionPage() {
               className="w-24 h-24 object-cover rounded-full"
             />
             <div className="text-center">
-              <h1 className="text-5xl font-medium text-[#314328] mb-2">Don't worry we've Got Someone for you here</h1>
+              <h1 className="text-5xl font-medium text-[#314328] mb-2">
+                Don&apos;t worry we&apos;ve Got Someone for you here
+              </h1>
               <p className="text-gray-600">
                 Ask Questions, Communicate, Share Your Thoughts, Or Seek Advice. Your Companion Is Here To Listen,
                 Support, And Guide You On Your Mental Wellness Journey.
@@ -219,7 +159,7 @@ export default function YourCompanionPage() {
             ref={chatContainerRef}
             onScroll={handleScroll}
             tabIndex={0}
-            style={{ WebkitOverflowScrolling: 'touch' }}
+            style={{ WebkitOverflowScrolling: "touch" }}
             className="bg-white/80 rounded-lg p-4 mb-4 h-[400px] overflow-y-auto focus:outline-none"
           >
             <AnimatePresence>
@@ -235,7 +175,7 @@ export default function YourCompanionPage() {
                     <span className="inline-block p-2 rounded-lg bg-[#c6e0bf] text-[#314328]">{message.text}</span>
                   ) : (
                     <div className="inline-block p-2 rounded-lg bg-[#d3ddcd]/70 text-[#526D4E] max-w-[80%]">
-                      {parseAndStyleMessage(message.text)}
+                      <ReactMarkdown>{message.text}</ReactMarkdown>
                     </div>
                   )}
                 </motion.div>
@@ -264,7 +204,6 @@ export default function YourCompanionPage() {
                 />
               </motion.div>
             )}
-            {/* Dummy element for scrolling */}
             <div ref={messagesEndRef} />
           </div>
 
@@ -293,5 +232,5 @@ export default function YourCompanionPage() {
         </div>
       </main>
     </motion.div>
-  )
+  );
 }
