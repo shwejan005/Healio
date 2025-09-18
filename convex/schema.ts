@@ -7,6 +7,7 @@ export default defineSchema({
     email: v.string(),
     image: v.optional(v.string()),
     clerkId: v.string(),
+    isPremium: v.optional(v.boolean()),
   }).index("by_clerk_id", ["clerkId"]),
 
   moodEntries: defineTable({

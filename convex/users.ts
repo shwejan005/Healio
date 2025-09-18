@@ -15,11 +15,22 @@ export const syncUser = mutation({
       .first()
  
     if (existingUser) {
-      return await ctx.db.patch(existingUser._id, {
+      const patchData: {
+        email: string;
+        name: string;
+        image?: string;
+        isPremium?: boolean;
+      } = {
         email: args.email,
         name: args.name,
         image: args.image,
-      })
+      };
+
+      if (existingUser.isPremium === undefined) {
+        patchData.isPremium = false;
+      }
+
+      return await ctx.db.patch(existingUser._id, patchData);
     }
 
     return await ctx.db.insert("users", {
@@ -27,6 +38,7 @@ export const syncUser = mutation({
       email: args.email,
       name: args.name,
       image: args.image,
+      isPremium: false,
     })
   },
 })
@@ -55,3 +67,4 @@ export const mustGetCurrentUser = async (ctx: QueryCtx | MutationCtx) => {
   if (!user) throw new Error("User not found");
   return user;
 };
+
