@@ -1,8 +1,11 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { motion } from "framer-motion";
 import Navbar from "../components/Navbar";
+import { useMutation } from "convex/react";
+import { api } from "@/convex/_generated/api";
+import { useUser } from "@clerk/nextjs";
 
 declare global {
   interface Window {
@@ -11,61 +14,72 @@ declare global {
 }
 
 export default function UpgradePage() {
+  const { user } = useUser();
+  const userEmail = user?.emailAddresses?.[0]?.emailAddress || ""; // Safe string
+  const makeUserPremium = useMutation(api.users.makeUserPremium);
+  const paypalRef = useRef<HTMLDivElement>(null);
+
   useEffect(() => {
-    // Dynamically add PayPal script
-    const script = document.createElement("script");
-    script.src = `https://www.paypal.com/sdk/js?client-id=${process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID}&currency=USD`;
-    script.async = true;
+    if (!paypalRef.current || !userEmail) return; // Wait until email and container exist
 
-    script.onload = () => {
-      if (window.paypal) {
-        window.paypal
-          .Buttons({
-            style: {
-              layout: "horizontal",
-              color: "gold",
-              shape: "rect",
-              label: "pay",
-            },
-            createOrder: (_data: any, actions: any) => {
-              return actions.order.create({
-                purchase_units: [
-                  {
-                    amount: {
-                      currency_code: "USD",
-                      value: "2.99", // Replace with dynamic value if needed
+    // Only inject PayPal script once
+    if (!document.getElementById("paypal-sdk")) {
+      const script = document.createElement("script");
+      script.id = "paypal-sdk";
+      script.src = `https://www.paypal.com/sdk/js?client-id=${process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID}&currency=USD`;
+      script.async = true;
+
+      script.onload = () => {
+        if (window.paypal && paypalRef.current) {
+          window.paypal
+            .Buttons({
+              style: {
+                layout: "horizontal",
+                color: "gold",
+                shape: "rect",
+                label: "pay",
+              },
+              createOrder: (_data: any, actions: any) => {
+                return actions.order.create({
+                  purchase_units: [
+                    {
+                      amount: {
+                        currency_code: "USD",
+                        value: "2.99",
+                      },
                     },
-                  },
-                ],
-              });
-            },
-            onApprove: async (_data: any, actions: any) => {
-              try {
-                const details = await actions.order.capture();
-                alert(
-                  `✅ Payment successful! Thank you ${details.payer.name.given_name}`
-                );
-              } catch (err) {
-                console.error("❌ Error capturing order:", err);
-              }
-            },
-            onError: (err: any) => {
-              console.error("❌ PayPal Error:", err);
-            },
-          })
-          .render("#paypal-button-container");
-      }
-    };
+                  ],
+                });
+              },
+              onApprove: async (_data: any, actions: any) => {
+                try {
+                  const details = await actions.order.capture();
 
-    document.body.appendChild(script);
+                  // Convex mutation to mark user as premium
+                  await makeUserPremium({ email: userEmail });
+                  console.log("✅ User upgraded to premium in Convex!");
+                } catch (err) {
+                  console.error(
+                    "❌ Error capturing order or updating user:",
+                    err
+                  );
+                }
+              },
+              onError: (err: any) => {
+                console.error("❌ PayPal Error:", err);
+              },
+            })
+            .render(paypalRef.current);
+        }
+      };
 
-    // Cleanup
+      document.body.appendChild(script);
+    }
+
     return () => {
-      document.body.removeChild(script);
-      const container = document.getElementById("paypal-button-container");
-      if (container) container.innerHTML = "";
+      if (paypalRef.current) paypalRef.current.innerHTML = "";
     };
-  }, []);
+  }, [userEmail, makeUserPremium]);
 
   return (
     <div>
@@ -99,7 +113,7 @@ export default function UpgradePage() {
         </div>
 
         <div className="flex justify-center items-center py-5 px-20 mt-12">
-          <div id="paypal-button-container" className="w-[300px]"></div>
+          <div ref={paypalRef} className="w-[300px]"></div>
         </div>
       </div>
     </div>

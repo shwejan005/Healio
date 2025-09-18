@@ -8,7 +8,7 @@ export default defineSchema({
     image: v.optional(v.string()),
     clerkId: v.string(),
     isPremium: v.optional(v.boolean()),
-  }).index("by_clerk_id", ["clerkId"]),
+  }).index("by_clerk_id", ["clerkId"]).index("by_email", ["email"]),
 
   moodEntries: defineTable({
     userId: v.string(),
