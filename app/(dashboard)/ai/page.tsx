@@ -6,14 +6,27 @@ import { motion, AnimatePresence } from "framer-motion";
 import { ArrowUp } from "lucide-react";
 import Image from "next/image";
 import ReactMarkdown from "react-markdown";
+import { useUser } from "@clerk/nextjs";
 
 export default function YourCompanionPage() {
+  const { user } = useUser();
   const [messages, setMessages] = useState<{ sender: string; text: string }[]>([]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isAutoScroll, setIsAutoScroll] = useState(true);
+  const [isSyncing, setIsSyncing] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const chatContainerRef = useRef<HTMLDivElement>(null);
+
+  // Sync user data to Qdrant for RAG retrieval when page loads
+  useEffect(() => {
+    if (!user) return;
+    setIsSyncing(true);
+    fetch("/api/rag/sync", { method: "POST" })
+      .then(() => console.log("RAG sync completed"))
+      .catch((err) => console.error("RAG sync failed:", err))
+      .finally(() => setIsSyncing(false));
+  }, [user]);
 
   // Function to scroll to the bottom
   const scrollToBottom = () => {
@@ -151,6 +164,11 @@ export default function YourCompanionPage() {
                 Ask Questions, Communicate, Share Your Thoughts, Or Seek Advice. Your Companion Is Here To Listen,
                 Support, And Guide You On Your Mental Wellness Journey.
               </p>
+              {isSyncing && (
+                <p className="text-sm text-[#526D4E]/70 mt-2 animate-pulse">
+                  ✨ Personalizing your experience...
+                </p>
+              )}
             </div>
           </motion.div>
 
