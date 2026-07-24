@@ -26,7 +26,7 @@ const pageTitles: Record<string, { title: string; section: string }> = {
 export function DashboardHeader() {
   const pathname = usePathname()
   const { user } = useUser()
-  const pageInfo = pageTitles[pathname] || { title: "Sanctuary", section: "Healio" }
+  const pageInfo = pageTitles[pathname] || { title: "Dashboard", section: "Healio" }
 
   return (
     <header className="sticky top-0 z-40 w-full h-16 bg-white/80 backdrop-blur-xl border-b border-[#3a633a]/15 px-4 sm:px-6 flex items-center justify-between shadow-xs">
@@ -50,7 +50,7 @@ export function DashboardHeader() {
       <div className="flex items-center gap-3">
         <div className="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-xl bg-white/80 border border-[#3a633a]/20 text-xs text-[#4a7a4a] shadow-xs">
           <Search className="w-3.5 h-3.5 text-[#3a633a]" />
-          <span>Search sanctuary...</span>
+          <span>Search...</span>
           <kbd className="px-1.5 py-0.5 rounded bg-[#e0f0e0] text-[10px] font-mono text-[#2d4c2d]">⌘K</kbd>
         </div>
 

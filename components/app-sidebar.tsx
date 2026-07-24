@@ -103,9 +103,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             <span className="text-lg font-bold text-[#2d4c2d] tracking-tight group-hover:text-[#3a633a] transition-colors">
               Healio
             </span>
-            <span className="text-[10px] font-semibold text-[#4a7a4a] flex items-center gap-1">
-              <ShieldCheck className="w-3 h-3 text-[#3a633a]" /> Sanctuary Hub
-            </span>
           </div>
         </Link>
       </SidebarHeader>
