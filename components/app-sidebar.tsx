@@ -89,7 +89,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       className="font-montreal border-r border-[#3a633a]/15 bg-white/90 backdrop-blur-xl shadow-lg"
     >
       <SidebarHeader className="p-4 flex items-center justify-between border-b border-[#3a633a]/10">
-        <Link href="/home" className="flex items-center gap-3 group">
+        <Link href="/" className="flex items-center gap-3 group">
           <div className="p-1.5 rounded-xl bg-white shadow-sm border border-[#3a633a]/20 group-hover:scale-105 transition-transform flex-shrink-0">
             <Image
               src="/images/healio.png"
