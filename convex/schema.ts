@@ -51,6 +51,19 @@ export default defineSchema({
     title: v.string(),
     completed: v.boolean(),
     createdAt: v.number(),
+    category: v.optional(v.string()), // "mindfulness", "physical", "habits", "growth"
+    priority: v.optional(v.string()), // "high", "medium", "low"
+    dueDate: v.optional(v.string()),
+    subtasks: v.optional(
+      v.array(
+        v.object({
+          id: v.string(),
+          title: v.string(),
+          completed: v.boolean(),
+        })
+      )
+    ),
+    streak: v.optional(v.number()),
   }).index("byUserId", ["userId"]),
 
   rooms: defineTable({
@@ -58,6 +71,9 @@ export default defineSchema({
     maxUsers: v.number(),
     currentUsers: v.number(),
     activeUsers: v.array(v.string()),
+    description: v.optional(v.string()),
+    category: v.optional(v.string()),
+    topic: v.optional(v.string()),
   }).index("by_name", ["name"]),
 
   messages: defineTable({
@@ -65,6 +81,8 @@ export default defineSchema({
     sender: v.string(),
     text: v.string(),
     timestamp: v.number(),
+    avatarAlias: v.optional(v.string()),
+    reactions: v.optional(v.record(v.string(), v.number())),
   }).index("by_room", ["roomId"]),
 
   feedback: defineTable({
@@ -72,11 +90,14 @@ export default defineSchema({
     text: v.string(),
     createdAt: v.number(),
   }),
-  
+
   fitnessLogs: defineTable({
     userId: v.string(),
     workoutType: v.string(),
     duration: v.number(), // In minutes
     caloriesBurned: v.number(),
+    intensity: v.optional(v.string()), // "low", "moderate", "vigorous"
+    date: v.optional(v.string()),
+    notes: v.optional(v.string()),
   }).index("by_user", ["userId"]),
 });

@@ -4,21 +4,13 @@ import { useUser } from "@clerk/nextjs"
 import { useQuery } from "convex/react"
 import { api } from "@/convex/_generated/api"
 import { useState } from "react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Progress } from "@/components/ui/progress"
-import { Badge } from "@/components/ui/badge"
 import { BarChart, LineChart, PieChart } from "@/components/ui/charts"
-import { Loader2 } from "lucide-react"
-
-// Define TypeScript interfaces for our props
-interface StatCardProps {
-  title: string
-  value: string
-  description: string
-  icon: string
-  className?: string
-}
+import { Loader2, Smile, Target, Dumbbell, BookHeart, Users2, Shield, Calendar, Flame, Timer, Activity } from "lucide-react"
+import { SpotlightCard } from "@/components/reactbits/SpotlightCard"
+import { SplitText } from "@/components/reactbits/SplitText"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 
 export default function UserAnalyticsPage() {
   const { user } = useUser()
@@ -29,17 +21,17 @@ export default function UserAnalyticsPage() {
 
   if (!userId) {
     return (
-      <div className="flex h-screen items-center justify-center">
-        <p>Please sign in to view your analytics</p>
+      <div className="flex h-screen items-center justify-center text-[#4a7a4a]">
+        <p>Please sign in to view your account analytics.</p>
       </div>
     )
   }
 
   if (!analytics) {
     return (
-      <div className="flex h-screen items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
-        <p className="ml-2">Loading your analytics...</p>
+      <div className="flex h-screen items-center justify-center text-[#3a633a]">
+        <Loader2 className="h-8 w-8 animate-spin" />
+        <p className="ml-2 font-semibold text-sm">Loading your analytics dashboard...</p>
       </div>
     )
   }
@@ -47,148 +39,81 @@ export default function UserAnalyticsPage() {
   const { moodStats, gratitudeStats, forumStats, goalsStats, fitnessStats } = analytics
 
   return (
-    <div className="container mx-auto py-8">
-      <h1 className="text-3xl font-bold mb-6">Your Analytics Dashboard</h1>
+    <div className="font-montreal min-h-screen p-4 sm:p-8 max-w-6xl mx-auto space-y-8">
+      {/* Profile Header */}
+      <div className="p-6 sm:p-8 rounded-3xl bg-white/80 backdrop-blur-xl border border-white/80 shadow-xl flex flex-col sm:flex-row items-center justify-between gap-6">
+        <div className="flex items-center gap-4">
+          <Avatar className="w-16 h-16 border-2 border-[#3a633a]/30 shadow-md">
+            <AvatarImage src={user?.imageUrl} />
+            <AvatarFallback className="bg-[#3a633a] text-white font-bold text-xl">
+              {user?.fullName ? user.fullName.charAt(0) : "U"}
+            </AvatarFallback>
+          </Avatar>
+          <div>
+            <h1 className="text-2xl sm:text-3xl font-extrabold text-[#2d4c2d]">
+              <SplitText text={user?.fullName || "Wellness Member"} />
+            </h1>
+            <p className="text-xs text-[#4a7a4a] flex items-center gap-1.5 mt-0.5">
+              <Shield className="w-3.5 h-3.5 text-[#3a633a]" /> {user?.primaryEmailAddress?.emailAddress}
+            </p>
+          </div>
+        </div>
 
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="grid grid-cols-6 mb-8">
-          <TabsTrigger value="overview">Overview</TabsTrigger>
-          <TabsTrigger value="mood">Mood</TabsTrigger>
-          <TabsTrigger value="gratitude">Gratitude</TabsTrigger>
-          <TabsTrigger value="forum">Forum</TabsTrigger>
-          <TabsTrigger value="goals">Goals</TabsTrigger>
-          <TabsTrigger value="fitness">Fitness</TabsTrigger>
+        <div className="flex gap-3">
+          <div className="px-4 py-2.5 rounded-2xl bg-[#f0f9ed] border border-[#3a633a]/20 text-center shadow-sm">
+            <p className="text-xs font-bold text-[#3a633a]">Member Sanctuary</p>
+            <p className="text-[11px] text-[#4a7a4a]">Active Account</p>
+          </div>
+        </div>
+      </div>
+
+      {/* Tabs */}
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full space-y-6">
+        <TabsList className="grid grid-cols-3 sm:grid-cols-6 p-1.5 rounded-2xl bg-white/80 backdrop-blur-md border border-white/80 shadow-sm">
+          <TabsTrigger value="overview" className="rounded-xl text-xs font-semibold">Overview</TabsTrigger>
+          <TabsTrigger value="mood" className="rounded-xl text-xs font-semibold">Mood</TabsTrigger>
+          <TabsTrigger value="gratitude" className="rounded-xl text-xs font-semibold">Gratitude</TabsTrigger>
+          <TabsTrigger value="forum" className="rounded-xl text-xs font-semibold">Forum</TabsTrigger>
+          <TabsTrigger value="goals" className="rounded-xl text-xs font-semibold">Goals</TabsTrigger>
+          <TabsTrigger value="fitness" className="rounded-xl text-xs font-semibold">Fitness</TabsTrigger>
         </TabsList>
 
         <TabsContent value="overview" className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <StatCard
-              title="Mood"
-              value={moodStats.averageMood.toFixed(1)}
-              description="Average mood rating"
-              icon="😊"
-            />
-            <StatCard
-              title="Goals"
-              value={`${goalsStats.completionRate.toFixed(0)}%`}
-              description="Goal completion rate"
-              icon="🎯"
-            />
-            <StatCard
-              title="Fitness"
-              value={fitnessStats.totalWorkouts.toString()}
-              description="Total workouts"
-              icon="💪"
-            />
+            <SpotlightCard className="p-6 rounded-3xl bg-white/80 backdrop-blur-xl border border-white/80 shadow-md">
+              <div className="flex items-center justify-between mb-3">
+                <span className="text-xs font-bold uppercase tracking-wider text-[#4a7a4a]">Average Mood</span>
+                <Smile className="w-5 h-5 text-[#3a633a]" />
+              </div>
+              <p className="text-3xl font-extrabold text-[#2d4c2d]">{moodStats.averageMood.toFixed(1)} / 5</p>
+              <p className="text-xs text-[#4a7a4a] mt-1">Based on recent check-in entries</p>
+            </SpotlightCard>
+
+            <SpotlightCard className="p-6 rounded-3xl bg-white/80 backdrop-blur-xl border border-white/80 shadow-md">
+              <div className="flex items-center justify-between mb-3">
+                <span className="text-xs font-bold uppercase tracking-wider text-[#4a7a4a]">Goal Completion</span>
+                <Target className="w-5 h-5 text-amber-600" />
+              </div>
+              <p className="text-3xl font-extrabold text-[#2d4c2d]">{goalsStats.completionRate.toFixed(0)}%</p>
+              <p className="text-xs text-[#4a7a4a] mt-1">{goalsStats.completedGoals} of {goalsStats.totalGoals} achieved</p>
+            </SpotlightCard>
+
+            <SpotlightCard className="p-6 rounded-3xl bg-white/80 backdrop-blur-xl border border-white/80 shadow-md">
+              <div className="flex items-center justify-between mb-3">
+                <span className="text-xs font-bold uppercase tracking-wider text-[#4a7a4a]">Total Workouts</span>
+                <Dumbbell className="w-5 h-5 text-[#3a633a]" />
+              </div>
+              <p className="text-3xl font-extrabold text-[#2d4c2d]">{fitnessStats.totalWorkouts}</p>
+              <p className="text-xs text-[#4a7a4a] mt-1">{fitnessStats.totalCaloriesBurned} kcal total burned</p>
+            </SpotlightCard>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <Card>
-              <CardHeader>
-                <CardTitle>Mood Trend</CardTitle>
-                <CardDescription>Your mood over the last 7 entries</CardDescription>
-              </CardHeader>
-              <CardContent>
-                {moodStats.moodTrend.length > 0 ? (
-                  <LineChart
-                    data={moodStats.moodTrend.map((entry) => ({
-                      name: new Date(entry.date).toLocaleDateString(),
-                      value: entry.mood,
-                    }))}
-                    index="name"
-                    categories={["value"]}
-                    colors={["primary"]}
-                    valueFormatter={(value) => `${value}/10`}
-                    showLegend={false}
-                    showXAxis={true}
-                    showYAxis={true}
-                  />
-                ) : (
-                  <p className="text-center py-8 text-muted-foreground">No mood data available</p>
-                )}
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle>Workout Distribution</CardTitle>
-                <CardDescription>Types of workouts you&apos;ve done</CardDescription>
-              </CardHeader>
-              <CardContent>
-                {fitnessStats.workoutTypes.length > 0 ? (
-                  <PieChart
-                    data={fitnessStats.workoutTypes.map((wt) => ({
-                      name: wt.type,
-                      value: wt.count,
-                    }))}
-                    index="name"
-                    valueFormatter={(value) => `${value} workouts`}
-                    category="value"
-                    colors={["primary", "secondary", "accent", "destructive", "muted"]}
-                  />
-                ) : (
-                  <p className="text-center py-8 text-muted-foreground">No fitness data available</p>
-                )}
-              </CardContent>
-            </Card>
-          </div>
-
-          <Card>
-            <CardHeader>
-              <CardTitle>Recent Activity</CardTitle>
-              <CardDescription>Your latest actions across the platform</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                {forumStats.recentActivity.length > 0 ? (
-                  forumStats.recentActivity.map((activity, index) => (
-                    <div key={index} className="flex items-start gap-2 pb-2 border-b">
-                      <Badge variant={activity.type === "post" ? "default" : "secondary"}>
-                        {activity.type === "post" ? "Post" : "Comment"}
-                      </Badge>
-                      <div>
-                        <p className="font-medium">{activity.type === "post" ? activity.title : activity.content}</p>
-                        <p className="text-sm text-muted-foreground">{new Date(activity.date).toLocaleDateString()}</p>
-                      </div>
-                    </div>
-                  ))
-                ) : (
-                  <p className="text-center py-4 text-muted-foreground">No recent activity</p>
-                )}
+            <SpotlightCard className="p-6 rounded-3xl bg-white/80 backdrop-blur-xl border border-white/80 shadow-md space-y-4">
+              <div>
+                <h3 className="text-lg font-bold text-[#2d4c2d]">Mood Trend</h3>
+                <p className="text-xs text-[#4a7a4a]">Rating trajectory across recent entries</p>
               </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="mood" className="space-y-6">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-            <StatCard title="Average Mood" value={moodStats.averageMood.toFixed(1)} description="Out of 10" icon="😊" />
-            <StatCard
-              title="Average Sleep"
-              value={`${moodStats.averageSleep.toFixed(1)}h`}
-              description="Hours per night"
-              icon="😴"
-            />
-            <StatCard
-              title="Average Anxiety"
-              value={moodStats.averageAnxiety.toFixed(1)}
-              description="Out of 10"
-              icon="😰"
-            />
-            <StatCard
-              title="Average Stress"
-              value={moodStats.averageStress.toFixed(1)}
-              description="Out of 10"
-              icon="😓"
-            />
-          </div>
-
-          <Card>
-            <CardHeader>
-              <CardTitle>Mood Trend</CardTitle>
-              <CardDescription>Your mood over time</CardDescription>
-            </CardHeader>
-            <CardContent className="h-80">
               {moodStats.moodTrend.length > 0 ? (
                 <LineChart
                   data={moodStats.moodTrend.map((entry) => ({
@@ -198,286 +123,151 @@ export default function UserAnalyticsPage() {
                   index="name"
                   categories={["value"]}
                   colors={["primary"]}
-                  valueFormatter={(value) => `${value}/10`}
+                  valueFormatter={(value) => `${value}/5`}
                   showLegend={false}
                   showXAxis={true}
                   showYAxis={true}
                 />
               ) : (
-                <p className="text-center py-8 text-muted-foreground">No mood data available</p>
+                <p className="text-center py-8 text-xs text-[#4a7a4a]">No mood data recorded yet</p>
               )}
-            </CardContent>
-          </Card>
+            </SpotlightCard>
 
-          <Card>
-            <CardHeader>
-              <CardTitle>Common Activities</CardTitle>
-              <CardDescription>Activities that appear most in your entries</CardDescription>
-            </CardHeader>
-            <CardContent>
-              {moodStats.commonActivities.length > 0 ? (
-                <BarChart
-                  data={moodStats.commonActivities.map((act) => ({
-                    name: act.activity,
-                    value: act.count,
+            <SpotlightCard className="p-6 rounded-3xl bg-white/80 backdrop-blur-xl border border-white/80 shadow-md space-y-4">
+              <div>
+                <h3 className="text-lg font-bold text-[#2d4c2d]">Workout Breakdown</h3>
+                <p className="text-xs text-[#4a7a4a]">Distribution by exercise category</p>
+              </div>
+              {fitnessStats.workoutTypes.length > 0 ? (
+                <PieChart
+                  data={fitnessStats.workoutTypes.map((wt) => ({
+                    name: wt.type,
+                    value: wt.count,
                   }))}
                   index="name"
-                  categories={["value"]}
-                  colors={["primary"]}
-                  valueFormatter={(value) => `${value} times`}
-                  showLegend={false}
+                  valueFormatter={(value) => `${value} sessions`}
+                  category="value"
+                  colors={["primary", "secondary", "accent", "destructive", "muted"]}
                 />
               ) : (
-                <p className="text-center py-8 text-muted-foreground">No activity data available</p>
+                <p className="text-center py-8 text-xs text-[#4a7a4a]">No fitness activity recorded yet</p>
               )}
-            </CardContent>
-          </Card>
+            </SpotlightCard>
+          </div>
+        </TabsContent>
+
+        <TabsContent value="mood" className="space-y-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+            <SpotlightCard className="p-5 rounded-2xl bg-white/80 border border-white/80 text-center">
+              <Smile className="w-5 h-5 text-[#3a633a] mx-auto mb-1" />
+              <p className="text-2xl font-bold text-[#2d4c2d]">{moodStats.averageMood.toFixed(1)} / 5</p>
+              <p className="text-xs text-[#4a7a4a]">Average Mood</p>
+            </SpotlightCard>
+
+            <SpotlightCard className="p-5 rounded-2xl bg-white/80 border border-white/80 text-center">
+              <Calendar className="w-5 h-5 text-[#3a633a] mx-auto mb-1" />
+              <p className="text-2xl font-bold text-[#2d4c2d]">{moodStats.averageSleep.toFixed(1)} hrs</p>
+              <p className="text-xs text-[#4a7a4a]">Average Sleep</p>
+            </SpotlightCard>
+
+            <SpotlightCard className="p-5 rounded-2xl bg-white/80 border border-white/80 text-center">
+              <Activity className="w-5 h-5 text-amber-600 mx-auto mb-1" />
+              <p className="text-2xl font-bold text-[#2d4c2d]">{moodStats.averageAnxiety.toFixed(1)} / 5</p>
+              <p className="text-xs text-[#4a7a4a]">Anxiety Level</p>
+            </SpotlightCard>
+
+            <SpotlightCard className="p-5 rounded-2xl bg-white/80 border border-white/80 text-center">
+              <Activity className="w-5 h-5 text-rose-600 mx-auto mb-1" />
+              <p className="text-2xl font-bold text-[#2d4c2d]">{moodStats.averageStress.toFixed(1)} / 5</p>
+              <p className="text-xs text-[#4a7a4a]">Stress Level</p>
+            </SpotlightCard>
+          </div>
         </TabsContent>
 
         <TabsContent value="gratitude" className="space-y-6">
-          <StatCard
-            title="Gratitude Entries"
-            value={gratitudeStats.totalEntries.toString()}
-            description="Total entries recorded"
-            icon="🙏"
-            className="w-full md:w-1/3 mx-auto"
-          />
+          <SpotlightCard className="p-6 rounded-3xl bg-white/80 backdrop-blur-xl border border-white/80 shadow-md space-y-4">
+            <div className="flex items-center gap-3">
+              <div className="p-2.5 rounded-xl bg-[#e0f0e0] text-[#3a633a]">
+                <BookHeart className="w-5 h-5" />
+              </div>
+              <div>
+                <h3 className="text-lg font-bold text-[#2d4c2d]">Gratitude Entries Logged</h3>
+                <p className="text-xs text-[#4a7a4a]">{gratitudeStats.totalEntries} entries recorded</p>
+              </div>
+            </div>
 
-          <Card>
-            <CardHeader>
-              <CardTitle>Recent Gratitude Entries</CardTitle>
-              <CardDescription>Your latest expressions of gratitude</CardDescription>
-            </CardHeader>
-            <CardContent>
-              {gratitudeStats.recentEntries.length > 0 ? (
-                <div className="space-y-4">
-                  {gratitudeStats.recentEntries.map((entry, index) => (
-                    <div key={index} className="p-4 border rounded-lg">
-                      <p className="italic">&quot;{entry.gratitude}&quot;</p>
-                      <p className="text-sm text-muted-foreground mt-2">{new Date(entry.date).toLocaleDateString()}</p>
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <p className="text-center py-8 text-muted-foreground">No gratitude entries yet</p>
-              )}
-            </CardContent>
-          </Card>
+            {gratitudeStats.recentEntries.length > 0 ? (
+              <div className="space-y-3 pt-2">
+                {gratitudeStats.recentEntries.map((entry, index) => (
+                  <div key={index} className="p-4 rounded-2xl bg-[#f0f9ed] border border-[#3a633a]/15 text-xs text-[#2d4c2d]">
+                    <p className="italic font-medium">&quot;{entry.gratitude}&quot;</p>
+                    <p className="text-[11px] text-[#4a7a4a] mt-2 font-semibold">{new Date(entry.date).toLocaleDateString()}</p>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="text-center py-8 text-xs text-[#4a7a4a]">No gratitude entries yet</p>
+            )}
+          </SpotlightCard>
         </TabsContent>
 
         <TabsContent value="forum" className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <StatCard
-              title="Forum Posts"
-              value={forumStats.totalPosts.toString()}
-              description="Total posts created"
-              icon="📝"
-            />
-            <StatCard
-              title="Comments"
-              value={forumStats.totalComments.toString()}
-              description="Total comments made"
-              icon="💬"
-            />
-          </div>
+            <SpotlightCard className="p-6 rounded-3xl bg-white/80 border border-white/80 flex items-center justify-between">
+              <div>
+                <p className="text-xs font-bold uppercase tracking-wider text-[#4a7a4a]">Forum Posts</p>
+                <p className="text-3xl font-extrabold text-[#2d4c2d] mt-1">{forumStats.totalPosts}</p>
+              </div>
+              <Users2 className="w-8 h-8 text-[#3a633a]" />
+            </SpotlightCard>
 
-          <Card>
-            <CardHeader>
-              <CardTitle>Recent Forum Activity</CardTitle>
-              <CardDescription>Your latest posts and comments</CardDescription>
-            </CardHeader>
-            <CardContent>
-              {forumStats.recentActivity.length > 0 ? (
-                <div className="space-y-4">
-                  {forumStats.recentActivity.map((activity, index) => (
-                    <div key={index} className="flex items-start gap-2 pb-4 border-b">
-                      <Badge variant={activity.type === "post" ? "default" : "secondary"}>
-                        {activity.type === "post" ? "Post" : "Comment"}
-                      </Badge>
-                      <div>
-                        <p className="font-medium">{activity.type === "post" ? activity.title : activity.content}</p>
-                        <p className="text-sm text-muted-foreground">{new Date(activity.date).toLocaleDateString()}</p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <p className="text-center py-8 text-muted-foreground">No forum activity yet</p>
-              )}
-            </CardContent>
-          </Card>
+            <SpotlightCard className="p-6 rounded-3xl bg-white/80 border border-white/80 flex items-center justify-between">
+              <div>
+                <p className="text-xs font-bold uppercase tracking-wider text-[#4a7a4a]">Comments Shared</p>
+                <p className="text-3xl font-extrabold text-[#2d4c2d] mt-1">{forumStats.totalComments}</p>
+              </div>
+              <Users2 className="w-8 h-8 text-[#3a633a]" />
+            </SpotlightCard>
+          </div>
         </TabsContent>
 
         <TabsContent value="goals" className="space-y-6">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <StatCard
-              title="Total Goals"
-              value={goalsStats.totalGoals.toString()}
-              description="Goals created"
-              icon="📋"
-            />
-            <StatCard
-              title="Completed"
-              value={goalsStats.completedGoals.toString()}
-              description="Goals achieved"
-              icon="✅"
-            />
-            <StatCard
-              title="Completion Rate"
-              value={`${goalsStats.completionRate.toFixed(0)}%`}
-              description="Success rate"
-              icon="📊"
-            />
-          </div>
-
-          <Card>
-            <CardHeader>
-              <CardTitle>Goal Completion</CardTitle>
-              <CardDescription>Your progress</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-2">
-                <div className="flex justify-between text-sm">
-                  <span>Progress</span>
-                  <span>{goalsStats.completionRate.toFixed(0)}%</span>
-                </div>
-                <Progress value={goalsStats.completionRate} className="h-2" />
+          <SpotlightCard className="p-6 rounded-3xl bg-white/80 backdrop-blur-xl border border-white/80 shadow-md space-y-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <h3 className="text-lg font-bold text-[#2d4c2d]">Goal Progress Overview</h3>
+                <p className="text-xs text-[#4a7a4a]">{goalsStats.completedGoals} of {goalsStats.totalGoals} goals completed</p>
               </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle>Active Goals</CardTitle>
-              <CardDescription>Goals you&apos;re currently working on</CardDescription>
-            </CardHeader>
-            <CardContent>
-              {goalsStats.activeGoals.length > 0 ? (
-                <div className="space-y-4">
-                  {goalsStats.activeGoals.map((goal, index) => (
-                    <div key={index} className="p-4 border rounded-lg">
-                      <p className="font-medium">{goal.title}</p>
-                      <p className="text-sm text-muted-foreground mt-1">
-                        Created on {new Date(goal.createdAt).toLocaleDateString()}
-                      </p>
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <p className="text-center py-8 text-muted-foreground">No active goals</p>
-              )}
-            </CardContent>
-          </Card>
+              <span className="text-lg font-extrabold text-[#3a633a]">{goalsStats.completionRate.toFixed(0)}%</span>
+            </div>
+            <Progress value={goalsStats.completionRate} className="h-2.5 rounded-full bg-[#e0f0e0]" />
+          </SpotlightCard>
         </TabsContent>
 
         <TabsContent value="fitness" className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <StatCard
-              title="Total Workouts"
-              value={fitnessStats.totalWorkouts.toString()}
-              description="Workouts completed"
-              icon="🏋️‍♂️"
-            />
-            <StatCard
-              title="Total Duration"
-              value={`${Math.floor(fitnessStats.totalDuration / 60)}h ${fitnessStats.totalDuration % 60}m`}
-              description="Time spent exercising"
-              icon="⏱️"
-            />
-            <StatCard
-              title="Calories Burned"
-              value={fitnessStats.totalCaloriesBurned.toLocaleString()}
-              description="Total calories"
-              icon="🔥"
-            />
-          </div>
+            <SpotlightCard className="p-6 rounded-3xl bg-white/80 border border-white/80">
+              <Dumbbell className="w-5 h-5 text-[#3a633a] mb-2" />
+              <p className="text-2xl font-bold text-[#2d4c2d]">{fitnessStats.totalWorkouts}</p>
+              <p className="text-xs text-[#4a7a4a]">Total Workouts</p>
+            </SpotlightCard>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <Card>
-              <CardHeader>
-                <CardTitle>Workout Types</CardTitle>
-                <CardDescription>Distribution of your workouts</CardDescription>
-              </CardHeader>
-              <CardContent className="h-80">
-                {fitnessStats.workoutTypes.length > 0 ? (
-                  <PieChart
-                    data={fitnessStats.workoutTypes.map((wt) => ({
-                      name: wt.type,
-                      value: wt.count,
-                    }))}
-                    index="name"
-                    valueFormatter={(value) => `${value} workouts`}
-                    category="value"
-                    colors={["primary", "secondary", "accent", "destructive", "muted"]}
-                  />
-                ) : (
-                  <p className="text-center py-8 text-muted-foreground">No fitness data available</p>
-                )}
-              </CardContent>
-            </Card>
+            <SpotlightCard className="p-6 rounded-3xl bg-white/80 border border-white/80">
+              <Timer className="w-5 h-5 text-[#3a633a] mb-2" />
+              <p className="text-2xl font-bold text-[#2d4c2d]">
+                {Math.floor(fitnessStats.totalDuration / 60)}h {fitnessStats.totalDuration % 60}m
+              </p>
+              <p className="text-xs text-[#4a7a4a]">Exercise Duration</p>
+            </SpotlightCard>
 
-            <Card>
-              <CardHeader>
-                <CardTitle>Recent Workouts</CardTitle>
-                <CardDescription>Your latest fitness activities</CardDescription>
-              </CardHeader>
-              <CardContent>
-                {fitnessStats.recentWorkouts.length > 0 ? (
-                  <div className="space-y-4">
-                    {fitnessStats.recentWorkouts.map((workout, index) => (
-                      <div key={index} className="p-4 border rounded-lg">
-                        <div className="flex justify-between items-center">
-                          <div>
-                            <p className="font-medium">{workout.workoutType}</p>
-                            <p className="text-sm text-muted-foreground">
-                              {workout.duration} minutes • {workout.caloriesBurned} calories
-                            </p>
-                          </div>
-                          <Badge>{getWorkoutIcon(workout.workoutType)}</Badge>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  <p className="text-center py-8 text-muted-foreground">No recent workouts</p>
-                )}
-              </CardContent>
-            </Card>
+            <SpotlightCard className="p-6 rounded-3xl bg-white/80 border border-white/80">
+              <Flame className="w-5 h-5 text-amber-600 mb-2" />
+              <p className="text-2xl font-bold text-[#2d4c2d]">{fitnessStats.totalCaloriesBurned.toLocaleString()} kcal</p>
+              <p className="text-xs text-[#4a7a4a]">Calories Burned</p>
+            </SpotlightCard>
           </div>
         </TabsContent>
       </Tabs>
     </div>
   )
-}
-
-// Helper component for stat cards
-function StatCard({ title, value, description, icon, className = "" }: StatCardProps) {
-  return (
-    <Card className={className}>
-      <CardHeader className="flex flex-row items-center justify-between pb-2">
-        <CardTitle className="text-sm font-medium">{title}</CardTitle>
-        <span className="text-2xl">{icon}</span>
-      </CardHeader>
-      <CardContent>
-        <div className="text-2xl font-bold">{value}</div>
-        <p className="text-xs text-muted-foreground">{description}</p>
-      </CardContent>
-    </Card>
-  )
-}
-
-// Helper function to get workout icon
-function getWorkoutIcon(type: string): string {
-  const typeToIcon: Record<string, string> = {
-    Running: "🏃‍♂️",
-    Cycling: "🚴‍♀️",
-    Swimming: "🏊‍♂️",
-    Yoga: "🧘‍♀️",
-    Weightlifting: "🏋️‍♀️",
-    HIIT: "⚡",
-    Walking: "🚶‍♂️",
-    Hiking: "🥾",
-  }
-
-  return typeToIcon[type] || "💪"
 }

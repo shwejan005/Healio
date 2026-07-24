@@ -8,6 +8,9 @@ export const logFitness = mutation({
     workoutType: v.string(),
     duration: v.number(), // in minutes
     caloriesBurned: v.number(),
+    intensity: v.optional(v.string()), // "low", "moderate", "vigorous"
+    date: v.optional(v.string()),
+    notes: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
     await ctx.db.insert("fitnessLogs", {
@@ -15,6 +18,9 @@ export const logFitness = mutation({
       workoutType: args.workoutType,
       duration: args.duration,
       caloriesBurned: args.caloriesBurned,
+      intensity: args.intensity || "moderate",
+      date: args.date || new Date().toISOString().split("T")[0],
+      notes: args.notes || "",
     });
   },
 });
@@ -26,12 +32,14 @@ export const updateFitnessLog = mutation({
     workoutType: v.optional(v.string()),
     duration: v.optional(v.number()),
     caloriesBurned: v.optional(v.number()),
+    intensity: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
     await ctx.db.patch(args.logId, {
       ...(args.workoutType !== undefined && { workoutType: args.workoutType }),
       ...(args.duration !== undefined && { duration: args.duration }),
       ...(args.caloriesBurned !== undefined && { caloriesBurned: args.caloriesBurned }),
+      ...(args.intensity !== undefined && { intensity: args.intensity }),
     });
   },
 });
@@ -51,6 +59,7 @@ export const getFitnessLogs = query({
     return await ctx.db
       .query("fitnessLogs")
       .withIndex("by_user", (q) => q.eq("userId", args.userId))
+      .order("desc")
       .collect();
   },
 });
@@ -64,9 +73,8 @@ export const getWeeklyFitnessLogs = query({
       .withIndex("by_user", (q) => q.eq("userId", args.userId))
       .collect();
 
-    // Get logs for the last 7 days
     const now = Date.now();
-    const sevenDaysAgo = now - 7 * 24 * 60 * 60 * 1000; // 7 days in milliseconds
+    const sevenDaysAgo = now - 7 * 24 * 60 * 60 * 1000;
 
     return allLogs.filter((log) => log._creationTime >= sevenDaysAgo);
   },

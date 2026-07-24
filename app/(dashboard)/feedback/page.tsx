@@ -1,156 +1,195 @@
-"use client";
-import { useState } from "react";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { Star, Edit } from "lucide-react";
-import { motion } from "framer-motion";
-import { useMutation, useQuery } from "convex/react";
-import { api } from "@/convex/_generated/api";
-import Image from "next/image";
-import { useUser } from "@clerk/nextjs";
-import { Id } from "@/convex/_generated/dataModel";
+"use client"
+
+import { useState } from "react"
+import { Input } from "@/components/ui/input"
+import { Button } from "@/components/ui/button"
+import { Star, Edit, MessageSquareWarning } from "lucide-react"
+import { motion } from "framer-motion"
+import { useMutation, useQuery } from "convex/react"
+import { api } from "@/convex/_generated/api"
+import { useUser } from "@clerk/nextjs"
+import { Id } from "@/convex/_generated/dataModel"
+import { SpotlightCard } from "@/components/reactbits/SpotlightCard"
+import { SplitText } from "@/components/reactbits/SplitText"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 
 export default function FeedbackPage() {
   const { user } = useUser()
   const userId = user?.id
-  const [rating, setRating] = useState(0);
-  const [feedback, setFeedback] = useState("");
-  const [editId, setEditId] = useState<Id<"feedback"> | null>(null);
+  const [rating, setRating] = useState(0)
+  const [feedback, setFeedback] = useState("")
+  const [editId, setEditId] = useState<Id<"feedback"> | null>(null)
 
-  // Convex mutations and queries
-  const addFeedback = useMutation(api.feedback.submit);
-  const updateFeedback = useMutation(api.feedback.update);
-  const feedbackList = useQuery(api.feedback.getAll) as { 
-    _id: Id<"feedback">; 
-    _creationTime: number; 
-    createdAt: number; 
-    text: string; 
-    rating: number; 
-    userId: string; 
-  }[] || [];
+  const addFeedback = useMutation(api.feedback.submit)
+  const updateFeedback = useMutation(api.feedback.update)
+  const feedbackList = (useQuery(api.feedback.getAll) as Array<{
+    _id: Id<"feedback">
+    _creationTime: number
+    createdAt: number
+    text: string
+    rating: number
+    userId: string
+  }>) || []
 
-  // Fetch user details
-  const getUser = useQuery(api.users.getUser, { clerkId: userId || "" });
+  const getUser = useQuery(api.users.getUser, { clerkId: userId || "" })
 
-  // Calculate average rating
   const averageRating =
     feedbackList.length > 0
       ? (
-          feedbackList.reduce((acc: number, f: { rating: number }) => acc + f.rating, 0) /
+          feedbackList.reduce((acc: number, f) => acc + f.rating, 0) /
           feedbackList.length
         ).toFixed(1)
-      : "No ratings yet";
+      : "N/A"
 
-  // Submit or update feedback
   const handleSubmit = async () => {
     if (rating > 0 && feedback.trim() !== "") {
       if (editId) {
-        await updateFeedback({ id: editId, rating, text: feedback });
-        setEditId(null);
+        await updateFeedback({ id: editId, rating, text: feedback })
+        setEditId(null)
       } else {
-        await addFeedback({ rating, text: feedback });
+        await addFeedback({ rating, text: feedback })
       }
-      setFeedback("");
-      setRating(0);
+      setFeedback("")
+      setRating(0)
     }
-  };
+  }
 
-  // Enter edit mode
-  const handleEdit = (id: Id<"feedback">, rating: number, text: string) => {
-    setEditId(id);
-    setRating(rating);
-    setFeedback(text);
-  };
+  const handleEdit = (id: Id<"feedback">, ratingVal: number, text: string) => {
+    setEditId(id)
+    setRating(ratingVal)
+    setFeedback(text)
+  }
 
   return (
-    <div className="min-h-screen w-full flex flex-col items-center justify-center text-gray-900 p-10">
-      {/* Average Rating Display */}
-      <motion.div
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-        className="text-center text-4xl font-bold text-gray-800"
-      >
-        Average Rating: {averageRating} ⭐
-      </motion.div>
+    <div className="font-montreal min-h-screen p-4 sm:p-8 max-w-4xl mx-auto space-y-8">
+      {/* Header Banner */}
+      <div className="p-6 sm:p-8 rounded-3xl bg-white/80 backdrop-blur-xl border border-white/80 shadow-xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
+        <div className="space-y-1">
+          <span className="text-xs font-semibold uppercase tracking-wider text-[#3a633a] flex items-center gap-1.5">
+            <MessageSquareWarning className="w-4 h-4" /> Community Suggestions
+          </span>
+          <h1 className="text-3xl font-extrabold text-[#2d4c2d]">
+            <SplitText text="Feedback & Insights" />
+          </h1>
+          <p className="text-sm text-[#4a7a4a]">
+            Help us improve Healio. Your suggestions directly shape future features.
+          </p>
+        </div>
 
-      {/* Feedback Form */}
-      <motion.div
-        initial={{ opacity: 0, scale: 0.95 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ duration: 0.4 }}
-        className="w-full max-w-2xl mt-6"
-      >
-        <Card className="shadow-md border border-gray-300 bg-white">
-          <CardContent className="p-6 space-y-6">
-            <div className="flex justify-center gap-4">
-              {[1, 2, 3, 4, 5].map((num) => (
-                <motion.div key={num} whileHover={{ scale: 1.2 }} whileTap={{ scale: 0.9 }}>
-                  <Star
-                    className={`w-10 h-10 cursor-pointer transition-all ${rating >= num ? "text-yellow-500" : "text-gray-400"}`}
-                    onClick={() => setRating(num)}
-                  />
-                </motion.div>
-              ))}
-            </div>
-            <Input
-              className="p-4 text-lg border border-gray-300 focus:ring-2 focus:ring-green-400"
-              placeholder="Share your thoughts..."
-              value={feedback}
-              onChange={(e) => setFeedback(e.target.value)}
-            />
-            <Button
-              onClick={handleSubmit}
-              disabled={rating === 0 || !feedback.trim()}
-              className="w-full py-4 text-lg font-semibold"
+        {feedbackList.length > 0 && (
+          <div className="p-4 rounded-2xl bg-[#f0f9ed] border border-[#3a633a]/20 text-center min-w-[140px] shadow-sm">
+            <p className="text-2xl font-extrabold text-[#2d4c2d]">{averageRating} / 5</p>
+            <p className="text-xs text-[#4a7a4a] font-medium">Average User Rating</p>
+          </div>
+        )}
+      </div>
+
+      {/* Feedback Form Card */}
+      <SpotlightCard className="p-6 rounded-3xl bg-white/85 backdrop-blur-xl border border-white/80 shadow-xl space-y-5">
+        <h2 className="text-lg font-bold text-[#2d4c2d]">
+          {editId ? "Edit Your Feedback" : "Submit Your Experience"}
+        </h2>
+
+        {/* Star Rating Select */}
+        <div className="flex items-center gap-2 py-2">
+          {[1, 2, 3, 4, 5].map((num) => (
+            <button
+              type="button"
+              key={num}
+              onClick={() => setRating(num)}
+              className="p-1 transition-transform hover:scale-110"
             >
-              {editId ? "Update Feedback" : "Submit Feedback"}
-            </Button>
-          </CardContent>
-        </Card>
-      </motion.div>
+              <Star
+                className={`w-7 h-7 transition-colors ${
+                  rating >= num
+                    ? "fill-amber-400 text-amber-400"
+                    : "text-slate-300 hover:text-amber-300"
+                }`}
+              />
+            </button>
+          ))}
+          <span className="ml-2 text-xs font-semibold text-[#4a7a4a]">
+            {rating > 0 ? `${rating} of 5 stars` : "Select a rating"}
+          </span>
+        </div>
 
-      {/* Feedback List */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, delay: 0.2 }}
-        className="w-full max-w-2xl space-y-4 mt-6"
-      >
+        <Input
+          className="p-3.5 rounded-xl border border-[#3a633a]/20 bg-white/90 text-sm text-[#2d4c2d] placeholder-[#4a7a4a]/50 focus:ring-2 focus:ring-[#3a633a]/30"
+          placeholder="Share your thoughts, suggestions, or issues..."
+          value={feedback}
+          onChange={(e) => setFeedback(e.target.value)}
+        />
+
+        <Button
+          onClick={handleSubmit}
+          disabled={rating === 0 || !feedback.trim()}
+          className="w-full bg-[#3a633a] hover:bg-[#2d4c2d] text-white font-semibold py-3 rounded-xl shadow-md transition-all text-sm disabled:opacity-50"
+        >
+          {editId ? "Update Submission" : "Submit Feedback"}
+        </Button>
+      </SpotlightCard>
+
+      {/* Community Feedback List */}
+      <div className="space-y-4">
+        <h2 className="text-xl font-bold text-[#2d4c2d]">Recent Community Reviews</h2>
+
         {feedbackList.length === 0 ? (
-          <p className="text-center text-lg text-gray-600">No feedback yet. Be the first! 🌟</p>
+          <SpotlightCard className="text-center p-12 rounded-3xl bg-white/70 backdrop-blur-xl border border-white/80 space-y-3">
+            <div className="w-12 h-12 rounded-2xl bg-[#e0f0e0] text-[#3a633a] flex items-center justify-center mx-auto shadow-sm">
+              <MessageSquareWarning className="w-6 h-6" />
+            </div>
+            <h3 className="text-lg font-bold text-[#2d4c2d]">No Feedback Submitted Yet</h3>
+            <p className="text-xs text-[#4a7a4a] max-w-sm mx-auto">
+              Be the first to submit a review and rate your experience with Healio.
+            </p>
+          </SpotlightCard>
         ) : (
-          feedbackList.map((f: { _id: Id<"feedback">; rating: number; text: string; userId: string }, idx: number) => {
-            const user = getUser?._id === f.userId ? getUser : null;
-            return (
-              <motion.div key={idx} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3, delay: idx * 0.1 }}>
-                <Card className="shadow-md border border-gray-300 bg-white">
-                  <CardContent className="p-5 flex items-center justify-between gap-4">
-                    <div className="flex items-center gap-4">
-                      <Image
-                        src={user?.image || "/images/user-image.png"}
-                        alt={user?.name || "User"}
-                        width={40}
-                        height={40}
-                        className="rounded-full border border-gray-300"
-                      />
+          <div className="space-y-3">
+            {feedbackList.map((f, idx) => {
+              const reviewUser = getUser?._id === f.userId ? getUser : null
+              return (
+                <motion.div
+                  key={f._id}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.3, delay: idx * 0.05 }}
+                >
+                  <div className="p-5 rounded-2xl bg-white/90 backdrop-blur-xl border border-white/80 shadow-sm flex items-center justify-between gap-4">
+                    <div className="flex items-center gap-3">
+                      <Avatar className="w-10 h-10 border border-[#3a633a]/20">
+                        <AvatarImage src={reviewUser?.image} />
+                        <AvatarFallback className="bg-[#3a633a] text-white font-bold text-xs">
+                          {reviewUser?.name ? reviewUser.name.charAt(0) : "U"}
+                        </AvatarFallback>
+                      </Avatar>
                       <div>
-                        <span className="text-md font-semibold text-gray-900">{user?.name || "Unknown User"}</span>
-                        <p className="text-sm text-gray-600">{f.text}</p>
+                        <div className="flex items-center gap-2">
+                          <span className="font-bold text-[#2d4c2d] text-sm">
+                            {reviewUser?.name || "Anonymous Member"}
+                          </span>
+                          <div className="flex items-center text-amber-500 text-xs font-bold gap-0.5">
+                            <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
+                            <span>{f.rating}</span>
+                          </div>
+                        </div>
+                        <p className="text-xs text-[#4a7a4a] mt-0.5">{f.text}</p>
                       </div>
                     </div>
-                    <div className="flex items-center gap-2">
-                      <span className="text-xl font-bold text-yellow-500">{f.rating} ⭐</span>
-                      <Edit className="w-5 h-5 cursor-pointer text-gray-500 hover:text-green-500" onClick={() => handleEdit(f._id, f.rating, f.text)} />
-                    </div>
-                  </CardContent>
-                </Card>
-              </motion.div>
-            );
-          })
+
+                    <button
+                      onClick={() => handleEdit(f._id, f.rating, f.text)}
+                      className="p-2 rounded-xl text-slate-400 hover:text-[#3a633a] hover:bg-[#e0f0e0] transition-colors"
+                      title="Edit feedback"
+                    >
+                      <Edit className="w-4 h-4" />
+                    </button>
+                  </div>
+                </motion.div>
+              )
+            })}
+          </div>
         )}
-      </motion.div>
+      </div>
     </div>
-  );
+  )
 }

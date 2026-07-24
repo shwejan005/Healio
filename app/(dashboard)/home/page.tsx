@@ -1,191 +1,260 @@
 "use client"
 
+import React, { useState, useEffect } from "react"
 import { useUser } from "@clerk/nextjs"
 import Link from "next/link"
-import { motion, AnimatePresence } from "framer-motion"
-import { useInView } from "react-intersection-observer"
+import { motion } from "framer-motion"
 import Loading from "@/components/loading"
+import { SpotlightCard } from "@/components/reactbits/SpotlightCard"
+import { SplitText } from "@/components/reactbits/SplitText"
+import { BlurText } from "@/components/reactbits/BlurText"
+import { ParticleBackground } from "@/components/reactbits/ParticleBackground"
+import {
+  ArrowRight,
+  Bed,
+  BookHeart,
+  BookOpen,
+  Calendar,
+  Compass,
+  Footprints,
+  MessageCircle,
+  MessageSquareWarning,
+  PersonStanding,
+  Plus,
+  Quote,
+  RefreshCw,
+  Soup,
+  Target,
+  Users2,
+  Sparkles,
+} from "lucide-react"
 
-const features = [
-  {
-    title: "Your Companion",
-    description: "A supportive AI companion for emotional support",
-    href: "/ai",
-  },
-  {
-    title: "Activities",
-    description: "Curated mindfulness exercises and relaxation techniques",
-    href: "/activities",
-  },
-  {
-    title: "Daily Mood Check-In",
-    description: "Track your emotional well-being and identify patterns",
-    href: "/check-in",
-  },
-  {
-    title: "Gratitude Journal",
-    description: "Document daily moments of appreciation and positivity",
-    href: "/gratitude",
-  },
-  {
-    title: "Anonymous Chats",
-    description: "Connect with others in a safe, confidential space",
-    href: "/chats",
-  },
-  {
-    title: "Story Generator",
-    description: "Create personalized calming stories for relaxation",
-    href: "/stories",
-  },
-  {
-    title: "Community Forum",
-    description: "Share experiences and find support in our welcoming community",
-    href: "/community",
-  },
-  {
-    title: "Goal Tracking",
-    description: "Set and monitor your personal wellness objectives",
-    href: "/goals",
-  },
-  {
-    title: "Sleep Debt",
-    description: "Monitor and manage your sleep patterns to reduce fatigue",
-    href: "/sleep",
-  },
-  {
-    title: "Feedback",
-    description: "Share your thoughts to help us improve your experience",
-    href: "/feedback",
-  },
-  {
-    title: "Personalized Diet",
-    description: "Get diet recommendations based on your mental & physical health",
-    href: "/diet",
-  },
-  {
-    title: "Track Physical Activities",
-    description: "Track how you move and improve it too",
-    href: "/fit",
-  },
-];
-
-interface Feature {
+interface FeatureItem {
   title: string
   description: string
   href: string
+  icon: React.ElementType
 }
 
-const FeatureCard = ({ feature, index }: { feature: Feature; index: number }) => {
-  const [ref, inView] = useInView({
-    triggerOnce: true,
-    threshold: 0.1,
-  })
+const features: FeatureItem[] = [
+  {
+    title: "Your Companion",
+    description: "An empathetic AI partner for emotional support & reflection",
+    href: "/ai",
+    icon: PersonStanding,
+  },
+  {
+    title: "Daily Mood Check-In",
+    description: "Track your emotional baseline and spot weekly trends",
+    href: "/check-in",
+    icon: Calendar,
+  },
+  {
+    title: "Gratitude Journal",
+    description: "Capture daily moments of appreciation & optimism",
+    href: "/gratitude",
+    icon: BookHeart,
+  },
+  {
+    title: "Mindful Activities",
+    description: "Curated breathing exercises, meditation & grounding",
+    href: "/activities",
+    icon: Plus,
+  },
+  {
+    title: "Calming Stories",
+    description: "AI generated sleep & relaxation narratives",
+    href: "/stories",
+    icon: BookOpen,
+  },
+  {
+    title: "Goal Tracking",
+    description: "Set achievable wellness milestones & track habit streaks",
+    href: "/goals",
+    icon: Target,
+  },
+  {
+    title: "Sleep Debt Manager",
+    description: "Monitor sleep deficit to reduce fatigue & optimize recovery",
+    href: "/sleep",
+    icon: Bed,
+  },
+  {
+    title: "Physical Activity",
+    description: "Track daily movement and its direct impact on mood",
+    href: "/fit",
+    icon: Footprints,
+  },
+  {
+    title: "Personalised Diet",
+    description: "Nutritional guidance tailored to your mental energy",
+    href: "/diet",
+    icon: Soup,
+  },
+  {
+    title: "Anonymous Community Chats",
+    description: "Connect with peers in a safe, judgment-free space",
+    href: "/chats",
+    icon: MessageCircle,
+  },
+  {
+    title: "Community Forum",
+    description: "Share stories & advice with the Healio wellness circle",
+    href: "/community",
+    icon: Users2,
+  },
+  {
+    title: "Feedback & Suggestions",
+    description: "Help us shape Healio into your ideal wellness haven",
+    href: "/feedback",
+    icon: MessageSquareWarning,
+  },
+]
 
-  return (
-    <motion.div
-      ref={ref}
-      initial={{ opacity: 0, y: 20 }}
-      animate={inView ? { opacity: 1, y: 0 } : {}}
-      transition={{ duration: 0.5, delay: index * 0.1 }}
-    >
-      <Link href={feature.href} className="block">
-        <motion.div
-          whileHover={{ scale: 1.05, rotate: 1 }}
-          whileTap={{ scale: 0.98 }}
-          className="group relative overflow-hidden rounded-xl bg-[#f3faf3] shadow-lg transition-all duration-300"
-        >
-          <motion.div
-            initial={{ opacity: 0 }}
-            whileHover={{ opacity: 1 }}
-            className="absolute inset-0 bg-gradient-to-br from-[#e0f0e0] to-[#c8e6c8] transition-opacity duration-300"
-          />
-          <div className="relative z-10 p-6">
-            <div className="flex items-center mb-4">
-              <motion.div
-                whileHover={{ rotate: 360 }}
-                transition={{ duration: 0.5 }}
-                className="bg-[#4a7a4a] rounded-full p-2 mr-3"
-              >
-                
-              </motion.div>
-              <h2 className="text-2xl font-bold text-[#2d4c2d]">{feature.title}</h2>
-            </div>
-            <p className="text-[#547454] transition-colors duration-300 text-lg">{feature.description}</p>
-          </div>
-          <motion.div
-            initial={{ x: 0 }}
-            whileHover={{ x: 8 }}
-            transition={{ duration: 0.3 }}
-            className="absolute bottom-4 right-4"
-          >
-          </motion.div>
-        </motion.div>
-      </Link>
-    </motion.div>
-  )
-}
+const quotes = [
+  { text: "In the middle of movement and chaos, keep stillness inside of you.", author: "Deepak Chopra" },
+  { text: "You don't have to control your thoughts. You just have to stop letting them control you.", author: "Dan Millman" },
+  { text: "Peace is the result of re-training your mind to process life as it is, rather than as you think it should be.", author: "Wayne Dyer" },
+  { text: "Almost everything will work again if you unplug it for a few minutes, including you.", author: "Anne Lamott" },
+]
 
 export default function DashboardPage() {
   const { user } = useUser()
+  const [greeting, setGreeting] = useState("Welcome back")
+  const [quoteIndex, setQuoteIndex] = useState(0)
+
+  useEffect(() => {
+    const hour = new Date().getHours()
+    if (hour < 12) setGreeting("Good Morning")
+    else if (hour < 18) setGreeting("Good Afternoon")
+    else setGreeting("Good Evening")
+  }, [])
 
   if (!user) return <Loading />
 
+  const currentQuote = quotes[quoteIndex]
+
   return (
-    <div className="font-montreal min-h-screen">
-      <div className="container mx-auto px-4 py-16">
-        <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8 }}
-          className="text-center mb-16"
-        >
-          <motion.h1
-            className="text-5xl mb-4 text-[#2d4c2d]"
-            initial={{ scale: 0.9 }}
-            animate={{ scale: 1 }}
-            transition={{ duration: 0.5, type: "spring", stiffness: 200 }}
-          >
-            Welcome to Healio, {user.firstName}!
-          </motion.h1>
-          <motion.p
-            className="text-2xl text-[#547454]"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.5, duration: 0.8 }}
-          >
-            Embark on your journey to inner peace and balance
-          </motion.p>
-        </motion.div>
+    <div className="font-montreal min-h-screen relative p-4 sm:p-8 md:p-12">
+      <ParticleBackground />
 
-        <AnimatePresence>
+      <div className="max-w-7xl mx-auto space-y-10 relative z-10">
+        {/* Top Hero Section */}
+        <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6 p-6 sm:p-8 rounded-3xl bg-white/80 backdrop-blur-xl border border-white/80 shadow-xl">
+          <div className="space-y-3 max-w-2xl">
+            <span className="text-xs font-semibold uppercase tracking-wider text-[#3a633a] flex items-center gap-1.5">
+              <Sparkles className="w-3.5 h-3.5" /> Wellness Sanctuary
+            </span>
+
+            <h1 className="text-3xl sm:text-5xl font-extrabold text-[#2d4c2d] tracking-tight">
+              <SplitText text={`${greeting}, ${user.firstName || "Friend"}`} />
+            </h1>
+
+            <BlurText delay={0.2} className="text-base sm:text-lg text-[#4a7a4a] leading-relaxed">
+              Welcome to your personal space. Take a moment to check in with yourself and explore your daily tools.
+            </BlurText>
+
+            <div className="pt-2 flex flex-wrap items-center gap-4">
+              <Link href="/check-in">
+                <motion.button
+                  whileHover={{ scale: 1.03 }}
+                  whileTap={{ scale: 0.97 }}
+                  className="px-5 py-3 rounded-xl bg-[#3a633a] hover:bg-[#2d4c2d] text-white font-semibold text-sm shadow-md transition-all"
+                >
+                  Start Daily Check-In
+                </motion.button>
+              </Link>
+              <Link href="/ai">
+                <motion.button
+                  whileHover={{ scale: 1.03 }}
+                  whileTap={{ scale: 0.97 }}
+                  className="px-5 py-3 rounded-xl bg-white/90 hover:bg-white text-[#2d4c2d] border border-[#3a633a]/20 font-semibold text-sm shadow-sm transition-all flex items-center gap-2"
+                >
+                  <PersonStanding className="w-4 h-4 text-[#3a633a]" /> Talk to AI Companion
+                </motion.button>
+              </Link>
+            </div>
+          </div>
+
+          {/* Daily Mindfulness Quote Widget */}
           <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 1, delay: 0.5 }}
-            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: 0.3 }}
+            className="w-full lg:w-80 p-5 rounded-2xl bg-gradient-to-br from-[#f0f9ed] to-[#e2f2de] border border-[#3a633a]/20 shadow-sm relative group"
           >
-            {features.map((feature, index) => (
-              <FeatureCard key={index} feature={feature} index={index} />
-            ))}
+            <div className="flex items-center justify-between mb-3 text-xs font-semibold text-[#4a7a4a] uppercase tracking-wider">
+              <span className="flex items-center gap-1.5">
+                <Quote className="w-3.5 h-3.5 text-[#3a633a]" /> Daily Inspiration
+              </span>
+              <button
+                onClick={() => setQuoteIndex((prev) => (prev + 1) % quotes.length)}
+                className="p-1 rounded-lg hover:bg-[#3a633a]/10 transition-colors text-[#3a633a]"
+                title="Next Quote"
+              >
+                <RefreshCw className="w-3.5 h-3.5" />
+              </button>
+            </div>
+            <p className="italic text-sm text-[#2d4c2d] leading-relaxed mb-3">
+              &quot;{currentQuote.text}&quot;
+            </p>
+            <p className="text-right text-xs font-semibold text-[#3a633a]">
+              — {currentQuote.author}
+            </p>
           </motion.div>
-        </AnimatePresence>
+        </div>
 
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 1 }}
-          className="mt-20 text-center"
-        >
-          <Link href="/check-in">
-            <motion.button
-              whileHover={{ scale: 1.05, boxShadow: "0 10px 20px rgba(0,0,0,0.1)" }}
-              whileTap={{ scale: 0.95 }}
-              className="bg-[#4a7a4a] hover:bg-[#5c965c] text-white font-bold py-4 px-8 rounded-full transition-all duration-300 shadow-lg text-xl"
-            >
-              Personalize Your Journey
-            </motion.button>
-          </Link>
-        </motion.div>
+        {/* Feature Cards Section Header */}
+        <div className="flex items-center justify-between pt-2">
+          <div>
+            <h2 className="text-2xl sm:text-3xl font-bold text-[#2d4c2d] flex items-center gap-2">
+              <Compass className="w-6 h-6 text-[#3a633a]" /> Wellness Tools
+            </h2>
+            <p className="text-sm text-[#4a7a4a]">
+              Select a module to view, track, or manage your personal progress.
+            </p>
+          </div>
+        </div>
+
+        {/* Feature Grid with Spotlight Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {features.map((feature, idx) => {
+            const Icon = feature.icon
+            return (
+              <motion.div
+                key={feature.title}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.4, delay: idx * 0.04 }}
+              >
+                <Link href={feature.href} className="block h-full">
+                  <SpotlightCard className="h-full flex flex-col justify-between group hover:border-[#3a633a]/40 bg-white/80">
+                    <div>
+                      <div className="flex items-center justify-between mb-4">
+                        <div className="p-3 rounded-xl bg-[#e0f0e0] text-[#2d4c2d] group-hover:bg-[#3a633a] group-hover:text-white transition-colors duration-300 shadow-sm">
+                          <Icon className="w-6 h-6" />
+                        </div>
+                      </div>
+
+                      <h3 className="text-xl font-bold text-[#2d4c2d] mb-2 group-hover:text-[#3a633a] transition-colors">
+                        {feature.title}
+                      </h3>
+
+                      <p className="text-sm text-[#4a7a4a] leading-relaxed mb-6">
+                        {feature.description}
+                      </p>
+                    </div>
+
+                    <div className="flex items-center justify-between pt-4 border-t border-[#3a633a]/10 text-xs font-semibold text-[#3a633a] group-hover:text-[#2d4c2d]">
+                      <span>Open Module</span>
+                      <ArrowRight className="w-4 h-4 transform group-hover:translate-x-1.5 transition-transform" />
+                    </div>
+                  </SpotlightCard>
+                </Link>
+              </motion.div>
+            )
+          })}
+        </div>
       </div>
     </div>
   )
