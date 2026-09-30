@@ -100,4 +100,23 @@ export default defineSchema({
     date: v.optional(v.string()),
     notes: v.optional(v.string()),
   }).index("by_user", ["userId"]),
+
+  auditLogs: defineTable({
+    traceId: v.string(),
+    userId: v.string(),
+    action: v.string(),
+    retrievedDocumentIds: v.array(v.string()),
+    toolCalls: v.array(
+      v.object({
+        name: v.string(),
+        input: v.string(),
+        status: v.string(),
+        latencyMs: v.number(),
+      }),
+    ),
+    complianceStatus: v.union(v.literal("PASSED"), v.literal("FLAGGED")),
+    timestamp: v.number(),
+  })
+    .index("by_trace", ["traceId"])
+    .index("by_user_trace", ["userId", "traceId"]),
 });

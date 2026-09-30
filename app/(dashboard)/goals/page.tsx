@@ -13,12 +13,10 @@ import {
   Plus,
   Target,
   Trash2,
-  Sparkles,
   Calendar,
   Flame,
   ChevronDown,
   ChevronUp,
-  Filter,
   Check,
   ListTodo,
 } from "lucide-react"

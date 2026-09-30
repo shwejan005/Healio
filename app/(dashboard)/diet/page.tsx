@@ -2,7 +2,6 @@
 
 import { useUser } from "@clerk/nextjs"
 import { useQuery } from "convex/react"
-import { motion } from "framer-motion"
 import { Apple, Salad, Sparkles, RefreshCw } from "lucide-react"
 import { useCallback, useEffect, useState } from "react"
 import { api } from "@/convex/_generated/api"
@@ -17,7 +16,6 @@ export default function DietPage() {
   const [isLoading, setIsLoading] = useState(false)
 
   const moodEntries = useQuery(api.moodEntries.getMoodEntries, userId ? { userId } : "skip")
-  const journalEntries = useQuery(api.journals.getEntries, userId ? { userId } : "skip")
   const fitnessLogs = useQuery(api.fitnessLogs.getFitnessLogs, userId ? { userId } : "skip")
 
   const calculateAverage = (arr: number[] | undefined) =>

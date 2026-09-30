@@ -1,0 +1,21 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    env_file:
+      - path: .env.local
+        required: false
+    environment:
+      RULES_ENGINE_URL: http://rules-engine:8081
+    depends_on:
+      - rules-engine
+
+  rules-engine:
+    build:
+      context: ./services/rules-engine
+      dockerfile: Dockerfile
+    ports:
+      - "8081:8081"

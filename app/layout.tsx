@@ -1,5 +1,4 @@
 import ConvexClerkProvider from "@/components/providers/ConvexClerkProvider";
-import { RedirectToSignIn, SignedOut } from "@clerk/nextjs";
 import type { Metadata } from "next";
 import { ThemeProvider } from "next-themes";
 import { League_Spartan } from "next/font/google";

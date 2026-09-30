@@ -84,7 +84,7 @@ export default function PhysicalActivities() {
             <h1 className="text-5xl font-medium text-[#314328] mb-2">
               Get Moving With These Workouts
             </h1>
-            <p className="text-gray-600">"Explore Activities You Can Do Anytime, Anywhere"</p>
+            <p className="text-gray-600">&quot;Explore Activities You Can Do Anytime, Anywhere&quot;</p>
           </div>
 
           {/* Workouts Section */}

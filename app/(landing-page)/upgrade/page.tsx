@@ -9,9 +9,25 @@ import { useUser } from "@clerk/nextjs";
 
 declare global {
   interface Window {
-    paypal?: any;
+    paypal?: PayPalSdk;
   }
 }
+
+type PayPalActions = {
+  order: {
+    create: (args: { purchase_units: Array<{ amount: { currency_code: string; value: string } }> }) => Promise<string>;
+    capture: () => Promise<unknown>;
+  };
+};
+
+type PayPalSdk = {
+  Buttons: (options: {
+    style: { layout: string; color: string; shape: string; label: string };
+    createOrder: (_data: Record<string, unknown>, actions: PayPalActions) => Promise<string>;
+    onApprove: (_data: Record<string, unknown>, actions: PayPalActions) => Promise<void>;
+    onError: (error: unknown) => void;
+  }) => { render: (container: HTMLElement) => Promise<void> | void };
+};
 
 export default function UpgradePage() {
   const { user } = useUser();
@@ -20,7 +36,8 @@ export default function UpgradePage() {
   const paypalRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (!paypalRef.current || !userEmail) return; // Wait until email and container exist
+    const paypalContainer = paypalRef.current;
+    if (!paypalContainer || !userEmail) return; // Wait until email and container exist
 
     // Only inject PayPal script once
     if (!document.getElementById("paypal-sdk")) {
@@ -30,7 +47,7 @@ export default function UpgradePage() {
       script.async = true;
 
       script.onload = () => {
-        if (window.paypal && paypalRef.current) {
+        if (window.paypal) {
           window.paypal
             .Buttons({
               style: {
@@ -39,7 +56,7 @@ export default function UpgradePage() {
                 shape: "rect",
                 label: "pay",
               },
-              createOrder: (_data: any, actions: any) => {
+              createOrder: (_data: Record<string, unknown>, actions: PayPalActions) => {
                 return actions.order.create({
                   purchase_units: [
                     {
@@ -51,9 +68,9 @@ export default function UpgradePage() {
                   ],
                 });
               },
-              onApprove: async (_data: any, actions: any) => {
+              onApprove: async (_data: Record<string, unknown>, actions: PayPalActions) => {
                 try {
-                  const details = await actions.order.capture();
+                  await actions.order.capture();
 
                   // Convex mutation to mark user as premium
                   await makeUserPremium({ email: userEmail });
@@ -65,11 +82,11 @@ export default function UpgradePage() {
                   );
                 }
               },
-              onError: (err: any) => {
+              onError: (err: unknown) => {
                 console.error("❌ PayPal Error:", err);
               },
             })
-            .render(paypalRef.current);
+            .render(paypalContainer);
         }
       };
 
@@ -77,7 +94,7 @@ export default function UpgradePage() {
     }
 
     return () => {
-      if (paypalRef.current) paypalRef.current.innerHTML = "";
+      paypalContainer.innerHTML = "";
     };
   }, [userEmail, makeUserPremium]);
 

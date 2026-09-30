@@ -1,4 +1,5 @@
 import { embedQuery } from "./embeddings"
+import type { LangfuseTrace } from "./observability/langfuse"
 import {
   search,
   RESOURCES_COLLECTION,
@@ -7,7 +8,8 @@ import {
 } from "./qdrant"
 
 /** Combined search result with source attribution */
-interface RetrievedChunk {
+export interface RetrievedChunk {
+  id: string
   text: string
   source: "resource" | "user_data"
   score: number
@@ -23,23 +25,29 @@ interface RetrievedChunk {
  */
 export async function retrieveContext(
   query: string,
-  userId?: string
+  userId?: string,
+  trace?: LangfuseTrace,
 ): Promise<RetrievedChunk[]> {
   // 1. Embed the user's query
-  const queryVector = await embedQuery(query)
+  const queryVector = await (trace
+    ? trace.span("embed_query", { query }, () => embedQuery(query), { taskType: "RETRIEVAL_QUERY" }, (vector) => ({ dimensions: vector.length, vectorHash: hashVector(vector) }))
+    : embedQuery(query))
 
   // 2. Search both collections in parallel
-  const [resourceResults, userDataResults] = await Promise.all([
-    // Search curated mental health resources (no user filter)
-    searchSafe(RESOURCES_COLLECTION, queryVector, 3),
-    // Search user-specific data (filtered by userId)
-    userId
-      ? searchSafe(USER_DATA_COLLECTION, queryVector, 5, userId)
-      : Promise.resolve([]),
-  ])
+  const searchResults = async () => Promise.all([
+      searchSafe(RESOURCES_COLLECTION, queryVector, 3),
+      userId ? searchSafe(USER_DATA_COLLECTION, queryVector, 5, userId) : Promise.resolve([]),
+    ])
+  const [resourceResults, userDataResults] = await (trace
+    ? trace.span("vector_retrieval", { vectorHash: hashVector(queryVector), dimensions: queryVector.length, filters: { userId: userId ? "authenticated-user" : "none" } }, searchResults, undefined, (results) => ({
+        ids: [...results[0], ...results[1]].map((item) => String(item.id)),
+        scores: [...results[0], ...results[1]].map((item) => item.score),
+      }))
+    : searchResults())
 
   // 3. Convert to RetrievedChunks with source attribution
   const resourceChunks: RetrievedChunk[] = resourceResults.map((r) => ({
+    id: String(r.id),
     text: r.payload.content as string,
     source: "resource" as const,
     score: r.score,
@@ -48,6 +56,7 @@ export async function retrieveContext(
   }))
 
   const userChunks: RetrievedChunk[] = userDataResults.map((r) => ({
+    id: String(r.id),
     text: r.payload.text as string,
     source: "user_data" as const,
     score: r.score,
@@ -60,6 +69,15 @@ export async function retrieveContext(
   )
 
   return allChunks
+}
+
+function hashVector(vector: number[]): string {
+  let hash = 2166136261
+  for (const value of vector) {
+    hash ^= Math.round(value * 1_000_000)
+    hash = Math.imul(hash, 16777619)
+  }
+  return (hash >>> 0).toString(16)
 }
 
 /**

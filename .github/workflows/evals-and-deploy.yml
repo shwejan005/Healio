@@ -1,0 +1,38 @@
+name: Eval and Docker Gate
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  quality:
+    runs-on: ubuntu-latest
+    env:
+      EVAL_REPORT_PATH: artifacts/eval-report.md
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci --legacy-peer-deps
+      - name: Lint
+        run: npm run lint
+      - name: Type check
+        run: npx tsc --noEmit
+      - name: Safety eval gate
+        run: npm run eval:safety
+      - name: Regression eval gate (must be 100%)
+        run: npm run eval:regression
+      - name: Full deterministic benchmark
+        run: npm run eval
+      - name: Upload eval scorecard
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: healio-eval-scorecard
+          path: artifacts/eval-report.md
+          if-no-files-found: ignore
+      - name: Docker build verification
+        run: docker build --tag healio:ci .

@@ -39,7 +39,6 @@ import {
   Soup,
   Target,
   Users2,
-  ShieldCheck,
 } from "lucide-react"
 
 const categories: NavCategory[] = [

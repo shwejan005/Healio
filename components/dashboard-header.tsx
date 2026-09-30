@@ -3,8 +3,8 @@
 import React from "react"
 import { usePathname } from "next/navigation"
 import { SidebarTrigger } from "@/components/ui/sidebar"
-import { useUser, UserButton } from "@clerk/nextjs"
-import { ChevronRight, Home, Search, Bell, Sparkles } from "lucide-react"
+import { UserButton } from "@clerk/nextjs"
+import { ChevronRight, Home, Search } from "lucide-react"
 
 const pageTitles: Record<string, { title: string; section: string }> = {
   "/home": { title: "Dashboard Overview", section: "Overview" },
@@ -25,7 +25,6 @@ const pageTitles: Record<string, { title: string; section: string }> = {
 
 export function DashboardHeader() {
   const pathname = usePathname()
-  const { user } = useUser()
   const pageInfo = pageTitles[pathname] || { title: "Dashboard", section: "Healio" }
 
   return (

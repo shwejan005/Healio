@@ -1,17 +1,15 @@
 "use client"
 
-import React, { useState, useEffect, useRef, Suspense, FC } from "react"
+import { useState, useEffect, Suspense } from "react"
 import { useMutation, useQuery } from "convex/react"
 import { api } from "@/convex/_generated/api"
 import { useSearchParams, useRouter } from "next/navigation"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import type { Id } from "@/convex/_generated/dataModel"
-import { cn } from "@/lib/utils"
-import { Send, LogOut, Plus, Users, MessageCircle, Shield, Hash, Heart, Smile, Sparkles, RefreshCw } from "lucide-react"
+import { Send, LogOut, Plus, MessageCircle, Shield, Hash } from "lucide-react"
 import { motion } from "framer-motion"
 import { SpotlightCard } from "@/components/reactbits/SpotlightCard"
-import { SplitText } from "@/components/reactbits/SplitText"
 
 const ANONYMOUS_ALIASES = [
   "Calm Panda",

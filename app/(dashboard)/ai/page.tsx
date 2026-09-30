@@ -15,8 +15,10 @@ export default function YourCompanionPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [isAutoScroll, setIsAutoScroll] = useState(true);
   const [isSyncing, setIsSyncing] = useState(false);
+  const [agentStatus, setAgentStatus] = useState("");
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const chatContainerRef = useRef<HTMLDivElement>(null);
+  const sessionIdRef = useRef("");
 
   // Sync user data to Qdrant for RAG retrieval when page loads
   useEffect(() => {
@@ -100,30 +102,70 @@ export default function YourCompanionPage() {
 
   const sendMessage = async () => {
     if (!input.trim() || isLoading) return;
-    const newMessage = { sender: "user", text: input.trim() };
-    setMessages([...messages, newMessage]);
+    const query = input.trim();
+    if (!sessionIdRef.current) sessionIdRef.current = crypto.randomUUID();
+    const history = messages.slice(-12).map((message) => ({ sender: message.sender, text: message.text }));
+    setMessages((current) => [...current, { sender: "user", text: query }, { sender: "ai", text: "" }]);
     setInput("");
     setIsLoading(true);
+    setAgentStatus("🔐 Securing your request…");
     try {
-      const response = await fetch("/api/chat", {
+      const response = await fetch("/api/chat/stream", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ query: input }),
+        body: JSON.stringify({ query, history, sessionId: sessionIdRef.current }),
       });
-      const data = await response.json();
-      const aiMessage = {
-        sender: "ai",
-        text: data.response || "I apologize, I need to process that request further.",
+      if (!response.ok || !response.body) {
+        const data = await response.json().catch(() => ({}));
+        throw new Error(typeof data.error === "string" ? data.error : "Unable to process the request");
+      }
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder();
+      let buffer = "";
+      const consume = (line: string) => {
+        if (!line.startsWith("data:")) return;
+        let event: { type?: string; message?: string; delta?: string; response?: string; status?: number };
+        try { event = JSON.parse(line.slice(5).trim()) as typeof event; } catch { return; }
+        if (event.type === "status" && event.message) setAgentStatus(event.message);
+        if (event.type === "token" && event.delta) {
+          setAgentStatus("");
+          setMessages((current) => {
+            const updated = [...current];
+            const last = updated[updated.length - 1];
+            if (last?.sender === "ai") updated[updated.length - 1] = { ...last, text: last.text + event.delta };
+            return updated;
+          });
+        }
+        if (event.type === "final" && event.response) {
+          setAgentStatus("");
+          setMessages((current) => {
+            const updated = [...current];
+            const last = updated[updated.length - 1];
+            if (last?.sender === "ai") updated[updated.length - 1] = { ...last, text: event.response ?? "" };
+            return updated;
+          });
+        }
+        if (event.type === "error") throw new Error(event.message || "Unable to process the request");
       };
-      setMessages((prevMessages) => [...prevMessages, aiMessage]);
-    } catch {
-      const errorMessage = {
-        sender: "ai",
-        text: "An error occurred. Please try again.",
-      };
-      setMessages((prevMessages) => [...prevMessages, errorMessage]);
+      while (true) {
+        const { done, value } = await reader.read();
+        buffer += decoder.decode(value, { stream: !done });
+        const lines = buffer.split("\n");
+        buffer = lines.pop() ?? "";
+        for (const line of lines) consume(line.trim());
+        if (done) break;
+      }
+      if (buffer.trim()) consume(buffer.trim());
+    } catch (error) {
+      setMessages((current) => {
+        const updated = [...current];
+        const last = updated[updated.length - 1];
+        if (last?.sender === "ai") updated[updated.length - 1] = { ...last, text: error instanceof Error ? error.message : "An error occurred. Please try again." };
+        return updated;
+      });
     } finally {
       setIsLoading(false);
+      setAgentStatus("");
     }
   };
 
@@ -220,6 +262,7 @@ export default function YourCompanionPage() {
                   transition={{ repeat: Number.POSITIVE_INFINITY, duration: 0.6, delay: 0.4 }}
                   className="w-2 h-2 bg-[#526D4E] rounded-full"
                 />
+                {agentStatus && <span className="text-sm text-[#526D4E]/80">{agentStatus}</span>}
               </motion.div>
             )}
             <div ref={messagesEndRef} />

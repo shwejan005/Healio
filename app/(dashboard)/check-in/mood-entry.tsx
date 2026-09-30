@@ -62,7 +62,7 @@ export function MoodEntry({ entry, onEdit, onDelete }: MoodEntryProps) {
       if (entry._id) {
         await onDelete(entry._id)
       }
-    } catch (error) {
+    } catch {
       setIsDeleting(false)
       setShowDeleteDialog(false)
     }
@@ -207,4 +207,3 @@ export function MoodEntry({ entry, onEdit, onDelete }: MoodEntryProps) {
     </>
   )
 }
-

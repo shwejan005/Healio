@@ -19,6 +19,7 @@
 
 # production
 /build
+/.eval-build/
 
 # misc
 .DS_Store

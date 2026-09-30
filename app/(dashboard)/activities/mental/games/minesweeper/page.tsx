@@ -28,7 +28,7 @@ export default function MineGame() {
 
     const initializeBoard = (): void => {
         // Create empty board
-        let newBoard: Cell[][] = Array(BOARD_SIZE)
+        const newBoard: Cell[][] = Array(BOARD_SIZE)
             .fill(null)
             .map(() =>
                 Array(BOARD_SIZE)

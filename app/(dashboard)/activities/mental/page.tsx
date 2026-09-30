@@ -150,12 +150,12 @@ export default function MentalActivities() {
                     {isPlaying && currentAudio === sound.audio ? (
                       <StopCircle className="text-red-500 cursor-pointer" onClick={stopAudio} size={30} />
                     ) : (
-                      <PlayCircle className="w-8 h-8 text-[#314328] hover:scale-110 transition-transform cursor-pointer" />
+                      <PlayCircle className="w-8 h-8 text-[#314328] hover:scale-110 transition-transform cursor-pointer" onClick={() => toggleAudio(sound.audio)} />
                     )}
                   </div>
                   <Dialog>
                     <DialogTrigger>
-                      <Button className="px-3 py-1 mt-2 text-white bg-[#314328] rounded-lg hover:bg-[#1f2b1f] transition">
+                      <Button onClick={() => setCurrentVideo(sound.video)} className="px-3 py-1 mt-2 text-white bg-[#314328] rounded-lg hover:bg-[#1f2b1f] transition">
                         Watch Video 🎥
                       </Button>
                     </DialogTrigger>
